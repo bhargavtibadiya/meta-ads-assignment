@@ -1,0 +1,233 @@
+---
+description: Conventional git commits — staging rules, message format, and co-author trailers when committing
+alwaysApply: false
+---
+
+
+# Commit Command
+
+Use this skill to (1) generate a conventional commit message, and (2) perform a git commit with the correct scope of changes.
+
+---
+
+## Commit Scope Rules
+
+- **Default behaviour (no special wording):**
+  - Only commit already-staged changes.
+  - Do **not** run `git add` on any files.
+  - Do **not** include untracked files or unstaged modifications.
+  - Use `git commit` with the generated message, relying solely on what is in the index.
+
+- **When the user explicitly wants everything committed** (e.g. "all changes", "commit everything", "include untracked"):
+  - Stage all relevant changes first using `git add -A` (preferred) or `git add .` from the repo root.
+  - Then run `git commit` with the generated message.
+
+- **Never stage untracked changes** unless the user clearly says so.
+- If the user's wording is ambiguous, **ask for clarification** before staging anything.
+
+---
+
+## How to Use This Skill
+
+1. Summarize the change set (from diff, description, or context) in plain language.
+2. Generate a commit message using the rules below.
+3. Confirm the scope — staged only, or all changes.
+4. Determine and append the correct co-author trailer (see rules below).
+5. Run the git commands according to the scope rules.
+6. Report back the final commit message and what was committed.
+
+---
+
+## Commit Message Format
+
+```
+<type>(<scope>): <short description>
+```
+
+**Hard rules:**
+
+- Total subject line must be **≤ 20 words**
+- All lowercase
+- No period at the end
+- No trailers, sign-offs, or body in the subject line
+- Co-author trailer always goes in the **body**, separated by a blank line
+
+## Types
+
+| Type | When to use |
+| ------ | ------------- |
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Code restructure, no behavior change |
+| `chore` | Maintenance, deps, config |
+| `docs` | Documentation only |
+| `style` | Formatting, whitespace, no logic change |
+| `test` | Adding or updating tests |
+| `perf` | Performance improvement |
+| `revert` | Reverting a previous commit |
+
+## Scope Guidelines
+
+| Area | Scope examples |
+| ------ | --------------- |
+| Authentication | `auth`, `login`, `session` |
+| API layer | `api`, `graphql`, `rest` |
+| UI components | `ui`, `modal`, `nav`, `form` |
+| Database | `db`, `schema`, `migration` |
+| Config/infra | `config`, `ci`, `env` |
+| Specific features | `cart`, `checkout`, `profile` |
+
+## Examples
+
+```
+fix(auth): resolve undefined payload in login API response
+feat(dashboard): add user activity chart to overview page
+refactor(cart): simplify discount calculation logic
+chore(deps): upgrade react to v19
+docs(readme): update setup instructions for new devs
+test(auth): add unit tests for token refresh logic
+perf(search): reduce query time by indexing user emails
+```
+
+---
+
+## Co-Author Trailers
+
+If the commit was generated or significantly assisted by an AI coding agent, a `Co-Authored-By` trailer **must** be appended to the commit body. This is mandatory, not optional.
+
+### How to Determine the Co-Author
+
+Follow this decision flow in order:
+
+**Step 1 — Check if the user mentioned the model/agent in their message.**
+If they said something like "using Cursor", "via Claude Code", "with GPT-4o" — use that.
+
+**Step 2 — Check if the agent/tool knows its own model identity.**
+Some agents expose their model name. Use the exact model name if known.
+
+**Step 3 — If model is unclear or unknown, ask the user once:**
+> "Which AI model or tool helped with this? (e.g. Claude Code, Cursor, Codex) — or say skip to use the default."
+
+**Step 4 — If the user doesn't reply, skips, or it still can't be determined, use the provider-level fallback** listed in the tables below. Never leave the trailer out entirely if an AI agent was involved.
+
+---
+
+### Claude (Anthropic)
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| Claude Opus 4.6 | `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>` |
+| Claude Sonnet 4.6 | `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>` |
+| Claude Haiku 4.5 | `Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>` |
+
+> Default fallback for any Claude/Claude Code involvement where model is unclear: **Claude Sonnet 4.6**
+
+---
+
+### OpenAI (Codex / ChatGPT / GPT models)
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| GPT-4o | `Co-Authored-By: GPT-4o <noreply@openai.com>` |
+| GPT-4.1 | `Co-Authored-By: GPT-4.1 <noreply@openai.com>` |
+| o3 | `Co-Authored-By: OpenAI o3 <noreply@openai.com>` |
+| o4-mini | `Co-Authored-By: OpenAI o4-mini <noreply@openai.com>` |
+| Codex CLI | `Co-Authored-By: OpenAI Codex <noreply@openai.com>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: OpenAI Codex <noreply@openai.com>` |
+
+> Default fallback for any OpenAI/Codex involvement where model is unclear: **OpenAI Codex**
+
+---
+
+### Cursor
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| Cursor (any model) | `Co-Authored-By: Cursor <cursoragent@cursor.com>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: Cursor <cursoragent@cursor.com>` |
+
+> Default fallback for any Cursor involvement: **Cursor**
+
+---
+
+### Antigravity
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| Antigravity (any model) | `Co-Authored-By: Antigravity <noreply@antigravity.dev>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: Antigravity <noreply@antigravity.dev>` |
+
+---
+
+### DeepSeek
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| DeepSeek V4 Pro | `Co-Authored-By: DeepSeek V4 Pro <deepseek@deepseek.com>` |
+| DeepSeek V4 Flash | `Co-Authored-By: DeepSeek V4 Flash <deepseek@deepseek.com>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: DeepSeek AI <deepseek@deepseek.com>` |
+
+> Default fallback for any DeepSeek involvement where model is unclear: **DeepSeek AI**
+
+---
+
+### Qwen
+
+| Model known? | Co-Author Trailer |
+| --- | --- |
+| Qwen 3.6 Max Preview | `Co-Authored-By: Qwen 3.6 Max Preview <qwen-coder@alibabacloud.com>` |
+| Qwen 3.6 Plus | `Co-Authored-By: Qwen 3.6 Plus <qwen-coder@alibabacloud.com>` |
+| Qwen 3.7 Max | `Co-Authored-By: Qwen 3.7 Max <qwen-coder@alibabacloud.com>` |
+| **Unknown / not sure → fallback** | `Co-Authored-By: Qwen-Coder <qwen-coder@alibabacloud.com>` |
+
+> Default fallback for any Qwen involvement where model is unclear: **Qwen-Coder
+
+---
+
+### Absolute Fallback (agent involved but provider also unknown)
+
+If an AI agent was clearly involved but you cannot determine the provider at all then use human-friendly generic fallback and don't include co author information that would be misleading.
+
+---
+
+### Trailer Placement Rules
+
+- Trailer goes in the **commit body**, separated from the subject by a blank line.
+- Never put the trailer in the subject line.
+- If **multiple agents** contributed, include all applicable trailers.
+
+**Single agent:**
+
+```
+feat(auth): add token refresh on session expiry
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+```
+
+**Multiple agents:**
+
+```
+refactor(api): simplify error handling middleware
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Co-Authored-By: Cursor <cursoragent@cursor.com>
+```
+
+**Human-only commit:**
+
+```
+fix(nav): correct broken link on mobile menu
+```
+
+No trailer needed.
+
+---
+
+### What NOT to include (unless asked)
+
+- `Signed-off-by`
+- `--author` flag
+- Extended commit body / description
+- Issue or ticket references
+- Breaking change footer

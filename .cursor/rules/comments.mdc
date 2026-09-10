@@ -1,0 +1,252 @@
+---
+description: Comment formats — tag one-liners, Q/A, section banners, and JSDoc
+alwaysApply: true
+---
+
+# Comment Standards
+
+Rules for writing comments across the codebase — when to use a one-liner vs a block, which format to reach for, and where it goes. Applies to every `.ts` / `.tsx` file, frontend and backend.
+
+There are exactly **two one-liner formats** and **two multi-line formats**. No others are permitted — consistency matters more than expressiveness here.
+
+---
+
+## The Four Formats at a Glance
+
+| Format | Type | Purpose |
+| -------- | ------ | --------- |
+| `// [TAG] ...` | One-liner | Quick, tagged reasoning tied to a single line |
+| `// Q: ... A: ...` | One-liner | Pre-empts a specific "why not X" review question |
+| Section Banner | Multi-line | Divides a file into major structural regions |
+| JSDoc Block | Multi-line | Documents a function's contract |
+
+---
+
+## One-Liner Formats
+
+### 1. Tag-Prefixed — `// [TAG] ...`
+
+The default one-liner. A bracketed tag classifies the comment's purpose before the reader even parses the sentence.
+
+**Allowed tags:**
+
+| Tag | Use for |
+| ----- | --------- |
+| `[WHY]` | Explaining a non-obvious decision |
+| `[WARN]` | Something that will break if misused or reordered |
+| `[NOTE]` | Context worth knowing, not a warning |
+| `[TODO]` | Known follow-up work, not urgent |
+| `[PERF]` | A deliberate performance trade-off |
+| `[SEC]` | A security-relevant decision |
+
+```ts
+// ✅
+// [WHY] using findFirst not findUnique — email isn't unique pre-migration
+const user = await prisma.user.findFirst({ where: { email } });
+
+// [WARN] order matters — cache must invalidate before the response is sent
+await redis.del(cacheKey);
+res.json(result);
+
+// [PERF] batching avoids an N+1 query across dog owners
+const owners = await getOwnersBatch(dogIds);
+```
+
+```ts
+// ❌ no tag — reads as a random aside, not classified
+// this has to run first
+await redis.del(cacheKey);
+
+// ❌ invented tag not in the table above
+// [FYI] ...
+```
+
+**Rule:** one tag per comment. If a line needs two tags, it needs a block comment instead (see JSDoc / Section Banner below).
+
+---
+
+### 2. Q/A — `// Q: ... A: ...`
+
+Reserved for a decision a reviewer or future-you is *likely to explicitly question*. Phrase the objection, then answer it. This is not a general-purpose format — most one-liners should be `[TAG]`, not `Q/A`.
+
+```ts
+// ✅
+// Q: why raw SQL here instead of Prisma? A: Prisma can't express this window function
+const rows = await prisma.$queryRaw`...`;
+
+// Q: why not throw on duplicate? A: PM decided silent no-op is correct for retries
+if (existing) return existing;
+```
+
+```ts
+// ❌ overused — this isn't a real objection anyone would raise
+// Q: why const? A: it doesn't change
+const limit = 10;
+```
+
+**Rule of thumb:** if you can't picture someone actually asking "wait, why did you do it this way?", use `[WHY]` instead of `Q/A`.
+
+---
+
+### Choosing Between the Two One-Liners
+
+| Situation | Use |
+| ----------- | ----- |
+| Explaining reasoning, a warning, or a trade-off | `[TAG]` |
+| Pre-empting a specific challenge to the approach | `Q/A` |
+| Default when unsure | `[TAG]` |
+
+---
+
+## Multi-Line Formats
+
+### 1. Section Banner
+
+Divides a file into major structural regions — not documentation for a single function, but a visual break between unrelated blocks (multiple thunks in one file, grouped DTOs, swagger path groups). Matches the `TYPE DEFINITIONS`-style banner already used in the codebase.
+
+```ts
+// ============================================================================
+// GET MY DOG THUNK
+// Fetches the authenticated user's dog profile; used on dashboard mount
+// ============================================================================
+```
+
+**Spec:**
+
+- Bar is `=` characters, same width as the longest line inside the banner (aim for 78 chars, matching existing docs)
+- Line 2: the section name, SCREAMING CASE or Title Case, matching surrounding banners in the file
+- Line 3 (optional): one plain-English purpose line — omit only if the section name is fully self-explanatory
+- One blank line after the closing bar, before the code starts
+- No blank line between the banner and the section it introduces from above
+
+**When to use:**
+
+- Top of a file with multiple exported thunks, services, or handlers
+- Grouping related DTOs, types, or constants inside one file
+- Marking off a distinct concern within a large file (e.g. `swagger/index.ts` separating `base`, `components`, `modules`)
+
+**When NOT to use:**
+
+- A file with only one function — there's nothing to divide
+- Documenting what a function does — that's JSDoc's job
+
+---
+
+### 2. JSDoc Structured Block
+
+Documents a function's contract: what it takes, what it returns, what it can throw. Sits directly above the function signature, no blank line between them.
+
+```ts
+/**
+ * Resolves the authenticated user's active dog profile.
+ *
+ * @param userId - ID of the requesting user
+ * @returns The dog profile, or null if none exists
+ * @throws {NotFoundError} if the user does not exist
+ */
+async function getActiveDog(userId: string): Promise<DogProfile | null> {
+  ...
+}
+```
+
+**Spec:**
+
+- First line: one sentence, what the function does (not how)
+- Blank comment line before tags if a description is present
+- `@param` for every parameter, in signature order
+- `@returns` always present, even if it just says what a void/boolean means
+- `@throws` only if the function can throw or reject — omit if it can't
+- No `@returns` line for `void` functions unless the void itself is meaningful (e.g. "no-ops silently on duplicate")
+
+**When to use:**
+
+- Every exported function in a `.service.ts`, `.controller.ts`, or thunk file
+- Any function whose parameters or return shape aren't obvious from the name alone
+- Public/shared utilities used across modules
+
+**When NOT to use:**
+
+- Private one-line helpers where the name says everything (`const toKebabCase = (s: string) => ...`)
+- Getters/setters with no logic
+
+---
+
+### Choosing Between the Two Multi-Liners
+
+| Situation | Use |
+| ----------- | ----- |
+| Dividing a file into regions | Section Banner |
+| Documenting a specific function's contract | JSDoc Block |
+| Both apply (a banner-marked section containing one exported function) | Use both — banner above the section, JSDoc directly above the function inside it |
+
+---
+
+## Placement Rules
+
+- Comments go **above** the code they explain — never trailing, except a `[TAG]` tied to one short expression on the same line (e.g. `const page = filters.page ?? 1; // [NOTE] defaults to page 1`)
+- One-liners are exactly one line — if it wraps, it's not a one-liner anymore; convert it to a JSDoc block
+- No blank line between a JSDoc block and the function it documents
+- One blank line between a Section Banner's closing bar and the code below it
+- Don't stack more than one one-liner format back-to-back — if a block needs several `[TAG]` lines, that's a sign it should be a JSDoc block instead
+
+---
+
+## Full Example
+
+```ts
+// ============================================================================
+// DOG THUNKS
+// Redux thunks for dog profile CRUD, consumed by the dashboard slice
+// ============================================================================
+
+/**
+ * Resolves the authenticated user's active dog profile.
+ *
+ * @param userId - ID of the requesting user
+ * @returns The dog profile, or null if none exists
+ * @throws {NotFoundError} if the user does not exist
+ */
+export async function getActiveDog(userId: string): Promise<DogProfile | null> {
+  // [WHY] using findFirst not findUnique — email isn't unique pre-migration
+  const user = await prisma.user.findFirst({ where: { id: userId } });
+  if (!user) throw new NotFoundError('User not found');
+
+  // Q: why not throw when no dog exists? A: PM wants empty-state UI, not an error page
+  return user.dog ?? null;
+}
+```
+
+---
+
+## Quick Reference
+
+| Situation | Format |
+| ----------- | -------- |
+| Non-obvious reasoning, warning, or trade-off on one line | `// [TAG] ...` |
+| Pre-empting a specific "why not X" question | `// Q: ... A: ...` |
+| Dividing a file into major structural regions | Section Banner |
+| Documenting an exported function's contract | JSDoc Block |
+
+## What to Avoid
+
+```ts
+// ❌ Commenting the obvious
+// increment counter by 1
+counter++;
+
+// ❌ Trailing comment longer than the code it explains
+const x = 5; // this sets x to five which is used later in the calculation for the total price
+
+// ❌ Inventing a fifth format
+/* --- random custom divider --- */
+
+// ❌ JSDoc on a self-explanatory one-liner
+/**
+ * Converts to kebab case.
+ */
+const toKebabCase = (s: string): string => s.toLowerCase().replace(/\s+/g, '-');
+
+// ❌ [TAG] used for something that isn't reasoning, a warning, or context
+// [WHY] this is a function
+function getUser() { ... }
+```
