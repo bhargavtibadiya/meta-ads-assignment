@@ -1,0 +1,1867 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.ad_accounts",
+    "label": "Create table \"ad_accounts\"",
+    "summary": "Creates table \"ad_accounts\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ad_accounts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ad_accounts\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_accounts\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ad_accounts\"",
+        "sql": "CREATE TABLE \"public\".\"ad_accounts\" (\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currency\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"meta_ad_account_id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"timezone_name\" text NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ad_accounts\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_accounts\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ad_insight_daily",
+    "label": "Create table \"ad_insight_daily\"",
+    "summary": "Creates table \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ad_insight_daily\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ad_insight_daily\"",
+        "sql": "CREATE TABLE \"public\".\"ad_insight_daily\" (\n  \"ad_id\" text NOT NULL,\n  \"ad_set_id\" text NOT NULL,\n  \"attribution_windows\" text NOT NULL,\n  \"campaign_id\" text NOT NULL,\n  \"clicks\" int4 DEFAULT 0 NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"date\" date NOT NULL,\n  \"id\" text NOT NULL,\n  \"impressions\" int4 DEFAULT 0 NOT NULL,\n  \"purchase_value\" numeric DEFAULT '0'::numeric NOT NULL,\n  \"purchases\" int4 DEFAULT 0 NOT NULL,\n  \"raw_actions_json\" jsonb,\n  \"spend\" numeric DEFAULT '0'::numeric NOT NULL,\n  \"synced_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ad_insight_daily\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ad_set_versions",
+    "label": "Create table \"ad_set_versions\"",
+    "summary": "Creates table \"ad_set_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ad_set_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ad_set_versions\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ad_set_versions\"",
+        "sql": "CREATE TABLE \"public\".\"ad_set_versions\" (\n  \"ad_set_id\" text NOT NULL,\n  \"effective_status\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"valid_from\" timestamptz NOT NULL,\n  \"valid_to\" timestamptz,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"ad_set_versions_effective_status_check_4695fc4a\" CHECK (\"effective_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN')),\n  CONSTRAINT \"ad_set_versions_status_check_8334ea1b\" CHECK (\"status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ad_set_versions\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ad_sets",
+    "label": "Create table \"ad_sets\"",
+    "summary": "Creates table \"ad_sets\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ad_sets"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ad_sets\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ad_sets\"",
+        "sql": "CREATE TABLE \"public\".\"ad_sets\" (\n  \"billing_event\" text,\n  \"campaign_id\" text NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"current_name\" text NOT NULL,\n  \"current_status\" text NOT NULL,\n  \"daily_budget\" numeric,\n  \"id\" text NOT NULL,\n  \"lifetime_budget\" numeric,\n  \"meta_ad_set_id\" text NOT NULL,\n  \"meta_created_time\" timestamptz,\n  \"optimization_goal\" text,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"ad_sets_current_status_check_b05be3ef\" CHECK (\"current_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ad_sets\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ad_versions",
+    "label": "Create table \"ad_versions\"",
+    "summary": "Creates table \"ad_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ad_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ad_versions\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ad_versions\"",
+        "sql": "CREATE TABLE \"public\".\"ad_versions\" (\n  \"ad_id\" text NOT NULL,\n  \"effective_status\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"valid_from\" timestamptz NOT NULL,\n  \"valid_to\" timestamptz,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"ad_versions_effective_status_check_4695fc4a\" CHECK (\"effective_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN')),\n  CONSTRAINT \"ad_versions_status_check_8334ea1b\" CHECK (\"status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ad_versions\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ads",
+    "label": "Create table \"ads\"",
+    "summary": "Creates table \"ads\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ads\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ads\"",
+        "sql": "CREATE TABLE \"public\".\"ads\" (\n  \"ad_set_id\" text NOT NULL,\n  \"campaign_id\" text NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"creative_meta_id\" text,\n  \"current_name\" text NOT NULL,\n  \"current_status\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"meta_ad_id\" text NOT NULL,\n  \"meta_created_time\" timestamptz,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"ads_current_status_check_b05be3ef\" CHECK (\"current_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ads\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.campaign_versions",
+    "label": "Create table \"campaign_versions\"",
+    "summary": "Creates table \"campaign_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "campaign_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"campaign_versions\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"campaign_versions\"",
+        "sql": "CREATE TABLE \"public\".\"campaign_versions\" (\n  \"campaign_id\" text NOT NULL,\n  \"effective_status\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"valid_from\" timestamptz NOT NULL,\n  \"valid_to\" timestamptz,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"campaign_versions_effective_status_check_4695fc4a\" CHECK (\"effective_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN')),\n  CONSTRAINT \"campaign_versions_status_check_8334ea1b\" CHECK (\"status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"campaign_versions\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.campaigns",
+    "label": "Create table \"campaigns\"",
+    "summary": "Creates table \"campaigns\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "campaigns"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"campaigns\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"campaigns\"",
+        "sql": "CREATE TABLE \"public\".\"campaigns\" (\n  \"ad_account_id\" text NOT NULL,\n  \"created_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"current_name\" text NOT NULL,\n  \"current_status\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"meta_campaign_id\" text NOT NULL,\n  \"meta_created_time\" timestamptz,\n  \"objective\" text,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"campaigns_current_status_check_b05be3ef\" CHECK (\"current_status\" IN ('ACTIVE', 'PAUSED', 'DELETED', 'ARCHIVED', 'IN_PROCESS', 'WITH_ISSUES', 'CAMPAIGN_PAUSED', 'ADSET_PAUSED', 'UNKNOWN'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"campaigns\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.orders",
+    "label": "Create table \"orders\"",
+    "summary": "Creates table \"orders\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "orders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"orders\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"orders\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"orders\"",
+        "sql": "CREATE TABLE \"public\".\"orders\" (\n  \"currency\" text,\n  \"external_order_id\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"imported_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"ordered_at\" timestamptz NOT NULL,\n  \"raw_row_json\" jsonb NOT NULL,\n  \"total_amount\" numeric NOT NULL,\n  \"utm_campaign\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"orders\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"orders\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.sync_cursors",
+    "label": "Create table \"sync_cursors\"",
+    "summary": "Creates table \"sync_cursors\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "sync_cursors"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"sync_cursors\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"sync_cursors\"",
+        "sql": "CREATE TABLE \"public\".\"sync_cursors\" (\n  \"ad_account_id\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"last_successful_sync_at\" timestamptz,\n  \"last_synced_through_date\" date NOT NULL,\n  \"updated_at\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"sync_cursors\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.sync_runs",
+    "label": "Create table \"sync_runs\"",
+    "summary": "Creates table \"sync_runs\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "sync_runs"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"sync_runs\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_runs\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"sync_runs\"",
+        "sql": "CREATE TABLE \"public\".\"sync_runs\" (\n  \"entity_type\" text NOT NULL,\n  \"error_message\" text,\n  \"finished_at\" timestamptz,\n  \"id\" text NOT NULL,\n  \"rows_upserted\" int4 DEFAULT 0 NOT NULL,\n  \"started_at\" timestamptz DEFAULT (now()) NOT NULL,\n  \"status\" text DEFAULT 'RUNNING' NOT NULL,\n  \"window_end\" date,\n  \"window_start\" date,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"sync_runs_entity_type_check_20a29848\" CHECK (\"entity_type\" IN ('HIERARCHY', 'INSIGHTS')),\n  CONSTRAINT \"sync_runs_status_check_5c3c95c5\" CHECK (\"status\" IN ('RUNNING', 'SUCCESS', 'FAILED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"sync_runs\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_runs\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.ad_accounts.ad_accounts_meta_ad_account_id_key",
+    "label": "Add unique constraint on \"ad_accounts\" (meta_ad_account_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ad_accounts_meta_ad_account_id_key",
+        "table": "ad_accounts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ad_accounts_meta_ad_account_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_accounts_meta_ad_account_id_key",
+          "public",
+          "\"public\".\"ad_accounts\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ad_accounts_meta_ad_account_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"ad_accounts\" ADD CONSTRAINT \"ad_accounts_meta_ad_account_id_key\" UNIQUE (\"meta_ad_account_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"ad_accounts_meta_ad_account_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_accounts_meta_ad_account_id_key",
+          "public",
+          "\"public\".\"ad_accounts\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.ad_insight_daily.ad_insight_daily_ad_id_date_key",
+    "label": "Add unique constraint on \"ad_insight_daily\" (ad_id, date)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ad_insight_daily_ad_id_date_key",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ad_insight_daily_ad_id_date_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_id_date_key",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ad_insight_daily_ad_id_date_key\"",
+        "sql": "ALTER TABLE \"public\".\"ad_insight_daily\" ADD CONSTRAINT \"ad_insight_daily_ad_id_date_key\" UNIQUE (\"ad_id\", \"date\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"ad_insight_daily_ad_id_date_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_id_date_key",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.ad_sets.ad_sets_meta_ad_set_id_key",
+    "label": "Add unique constraint on \"ad_sets\" (meta_ad_set_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ad_sets_meta_ad_set_id_key",
+        "table": "ad_sets"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ad_sets_meta_ad_set_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_sets_meta_ad_set_id_key",
+          "public",
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ad_sets_meta_ad_set_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"ad_sets\" ADD CONSTRAINT \"ad_sets_meta_ad_set_id_key\" UNIQUE (\"meta_ad_set_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"ad_sets_meta_ad_set_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_sets_meta_ad_set_id_key",
+          "public",
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.ads.ads_meta_ad_id_key",
+    "label": "Add unique constraint on \"ads\" (meta_ad_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ads_meta_ad_id_key",
+        "table": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ads_meta_ad_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_meta_ad_id_key",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ads_meta_ad_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"ads\" ADD CONSTRAINT \"ads_meta_ad_id_key\" UNIQUE (\"meta_ad_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"ads_meta_ad_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_meta_ad_id_key",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.campaigns.campaigns_meta_campaign_id_key",
+    "label": "Add unique constraint on \"campaigns\" (meta_campaign_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "campaigns_meta_campaign_id_key",
+        "table": "campaigns"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"campaigns_meta_campaign_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaigns_meta_campaign_id_key",
+          "public",
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"campaigns_meta_campaign_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"campaigns\" ADD CONSTRAINT \"campaigns_meta_campaign_id_key\" UNIQUE (\"meta_campaign_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"campaigns_meta_campaign_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaigns_meta_campaign_id_key",
+          "public",
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.orders.orders_external_order_id_key",
+    "label": "Add unique constraint on \"orders\" (external_order_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "orders_external_order_id_key",
+        "table": "orders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"orders_external_order_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "orders_external_order_id_key",
+          "public",
+          "\"public\".\"orders\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"orders_external_order_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"orders\" ADD CONSTRAINT \"orders_external_order_id_key\" UNIQUE (\"external_order_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"orders_external_order_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "orders_external_order_id_key",
+          "public",
+          "\"public\".\"orders\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.sync_cursors.sync_cursors_ad_account_id_key",
+    "label": "Add unique constraint on \"sync_cursors\" (ad_account_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "sync_cursors_ad_account_id_key",
+        "table": "sync_cursors"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"sync_cursors_ad_account_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sync_cursors_ad_account_id_key",
+          "public",
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"sync_cursors_ad_account_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"sync_cursors\" ADD CONSTRAINT \"sync_cursors_ad_account_id_key\" UNIQUE (\"ad_account_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"sync_cursors_ad_account_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sync_cursors_ad_account_id_key",
+          "public",
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_insight_daily.ad_insight_daily_ad_id_idx_4da8850a",
+    "label": "Create index \"ad_insight_daily_ad_id_idx_4da8850a\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_insight_daily_ad_id_idx_4da8850a",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_insight_daily_ad_id_idx_4da8850a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_ad_id_idx_4da8850a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_insight_daily_ad_id_idx_4da8850a\"",
+        "sql": "CREATE INDEX \"ad_insight_daily_ad_id_idx_4da8850a\" ON \"public\".\"ad_insight_daily\" (\"ad_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_insight_daily_ad_id_idx_4da8850a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_ad_id_idx_4da8850a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_insight_daily.ad_insight_daily_ad_set_id_idx_6bb39420",
+    "label": "Create index \"ad_insight_daily_ad_set_id_idx_6bb39420\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_insight_daily_ad_set_id_idx_6bb39420",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_insight_daily_ad_set_id_idx_6bb39420\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_insight_daily_ad_set_id_idx_6bb39420\"",
+        "sql": "CREATE INDEX \"ad_insight_daily_ad_set_id_idx_6bb39420\" ON \"public\".\"ad_insight_daily\" (\"ad_set_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_insight_daily_ad_set_id_idx_6bb39420\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_insight_daily.ad_insight_daily_campaign_id_date_idx_7dc28033",
+    "label": "Create index \"ad_insight_daily_campaign_id_date_idx_7dc28033\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_insight_daily_campaign_id_date_idx_7dc28033",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_insight_daily_campaign_id_date_idx_7dc28033\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_campaign_id_date_idx_7dc28033\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_insight_daily_campaign_id_date_idx_7dc28033\"",
+        "sql": "CREATE INDEX \"ad_insight_daily_campaign_id_date_idx_7dc28033\" ON \"public\".\"ad_insight_daily\" (\"campaign_id\", \"date\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_insight_daily_campaign_id_date_idx_7dc28033\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_campaign_id_date_idx_7dc28033\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_insight_daily.ad_insight_daily_campaign_id_idx_77cd6c37",
+    "label": "Create index \"ad_insight_daily_campaign_id_idx_77cd6c37\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_insight_daily_campaign_id_idx_77cd6c37",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_insight_daily_campaign_id_idx_77cd6c37\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_insight_daily_campaign_id_idx_77cd6c37\"",
+        "sql": "CREATE INDEX \"ad_insight_daily_campaign_id_idx_77cd6c37\" ON \"public\".\"ad_insight_daily\" (\"campaign_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_insight_daily_campaign_id_idx_77cd6c37\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_insight_daily.ad_insight_daily_date_idx_b4ca319c",
+    "label": "Create index \"ad_insight_daily_date_idx_b4ca319c\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_insight_daily_date_idx_b4ca319c",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_insight_daily_date_idx_b4ca319c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_date_idx_b4ca319c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_insight_daily_date_idx_b4ca319c\"",
+        "sql": "CREATE INDEX \"ad_insight_daily_date_idx_b4ca319c\" ON \"public\".\"ad_insight_daily\" (\"date\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_insight_daily_date_idx_b4ca319c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_insight_daily_date_idx_b4ca319c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_set_versions.ad_set_versions_ad_set_id_idx_6bb39420",
+    "label": "Create index \"ad_set_versions_ad_set_id_idx_6bb39420\" on \"ad_set_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_set_versions_ad_set_id_idx_6bb39420",
+        "table": "ad_set_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_set_versions_ad_set_id_idx_6bb39420\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_set_versions_ad_set_id_idx_6bb39420\"",
+        "sql": "CREATE INDEX \"ad_set_versions_ad_set_id_idx_6bb39420\" ON \"public\".\"ad_set_versions\" (\"ad_set_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_set_versions_ad_set_id_idx_6bb39420\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_set_versions.ad_set_versions_ad_set_id_valid_from_idx_7ff2465f",
+    "label": "Create index \"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\" on \"ad_set_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_set_versions_ad_set_id_valid_from_idx_7ff2465f",
+        "table": "ad_set_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\"",
+        "sql": "CREATE INDEX \"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\" ON \"public\".\"ad_set_versions\" (\"ad_set_id\", \"valid_from\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_set_versions_ad_set_id_valid_from_idx_7ff2465f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_sets.ad_sets_campaign_id_idx_77cd6c37",
+    "label": "Create index \"ad_sets_campaign_id_idx_77cd6c37\" on \"ad_sets\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_sets_campaign_id_idx_77cd6c37",
+        "table": "ad_sets"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_sets_campaign_id_idx_77cd6c37\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_sets_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_sets_campaign_id_idx_77cd6c37\"",
+        "sql": "CREATE INDEX \"ad_sets_campaign_id_idx_77cd6c37\" ON \"public\".\"ad_sets\" (\"campaign_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_sets_campaign_id_idx_77cd6c37\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_sets_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_versions.ad_versions_ad_id_idx_4da8850a",
+    "label": "Create index \"ad_versions_ad_id_idx_4da8850a\" on \"ad_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_versions_ad_id_idx_4da8850a",
+        "table": "ad_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_versions_ad_id_idx_4da8850a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions_ad_id_idx_4da8850a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_versions_ad_id_idx_4da8850a\"",
+        "sql": "CREATE INDEX \"ad_versions_ad_id_idx_4da8850a\" ON \"public\".\"ad_versions\" (\"ad_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_versions_ad_id_idx_4da8850a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions_ad_id_idx_4da8850a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ad_versions.ad_versions_ad_id_valid_from_idx_899ce29b",
+    "label": "Create index \"ad_versions_ad_id_valid_from_idx_899ce29b\" on \"ad_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ad_versions_ad_id_valid_from_idx_899ce29b",
+        "table": "ad_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ad_versions_ad_id_valid_from_idx_899ce29b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions_ad_id_valid_from_idx_899ce29b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ad_versions_ad_id_valid_from_idx_899ce29b\"",
+        "sql": "CREATE INDEX \"ad_versions_ad_id_valid_from_idx_899ce29b\" ON \"public\".\"ad_versions\" (\"ad_id\", \"valid_from\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ad_versions_ad_id_valid_from_idx_899ce29b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ad_versions_ad_id_valid_from_idx_899ce29b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ads.ads_ad_set_id_idx_6bb39420",
+    "label": "Create index \"ads_ad_set_id_idx_6bb39420\" on \"ads\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ads_ad_set_id_idx_6bb39420",
+        "table": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ads_ad_set_id_idx_6bb39420\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ads_ad_set_id_idx_6bb39420\"",
+        "sql": "CREATE INDEX \"ads_ad_set_id_idx_6bb39420\" ON \"public\".\"ads\" (\"ad_set_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ads_ad_set_id_idx_6bb39420\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads_ad_set_id_idx_6bb39420\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ads.ads_campaign_id_idx_77cd6c37",
+    "label": "Create index \"ads_campaign_id_idx_77cd6c37\" on \"ads\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ads_campaign_id_idx_77cd6c37",
+        "table": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ads_campaign_id_idx_77cd6c37\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ads_campaign_id_idx_77cd6c37\"",
+        "sql": "CREATE INDEX \"ads_campaign_id_idx_77cd6c37\" ON \"public\".\"ads\" (\"campaign_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ads_campaign_id_idx_77cd6c37\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ads_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.campaign_versions.campaign_versions_campaign_id_idx_77cd6c37",
+    "label": "Create index \"campaign_versions_campaign_id_idx_77cd6c37\" on \"campaign_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "campaign_versions_campaign_id_idx_77cd6c37",
+        "table": "campaign_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"campaign_versions_campaign_id_idx_77cd6c37\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"campaign_versions_campaign_id_idx_77cd6c37\"",
+        "sql": "CREATE INDEX \"campaign_versions_campaign_id_idx_77cd6c37\" ON \"public\".\"campaign_versions\" (\"campaign_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"campaign_versions_campaign_id_idx_77cd6c37\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions_campaign_id_idx_77cd6c37\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.campaign_versions.campaign_versions_campaign_id_valid_from_idx_67bd1ca8",
+    "label": "Create index \"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\" on \"campaign_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "campaign_versions_campaign_id_valid_from_idx_67bd1ca8",
+        "table": "campaign_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\"",
+        "sql": "CREATE INDEX \"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\" ON \"public\".\"campaign_versions\" (\"campaign_id\", \"valid_from\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaign_versions_campaign_id_valid_from_idx_67bd1ca8\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.campaigns.campaigns_ad_account_id_idx_a9d3bff4",
+    "label": "Create index \"campaigns_ad_account_id_idx_a9d3bff4\" on \"campaigns\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "campaigns_ad_account_id_idx_a9d3bff4",
+        "table": "campaigns"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"campaigns_ad_account_id_idx_a9d3bff4\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaigns_ad_account_id_idx_a9d3bff4\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"campaigns_ad_account_id_idx_a9d3bff4\"",
+        "sql": "CREATE INDEX \"campaigns_ad_account_id_idx_a9d3bff4\" ON \"public\".\"campaigns\" (\"ad_account_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"campaigns_ad_account_id_idx_a9d3bff4\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"campaigns_ad_account_id_idx_a9d3bff4\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.orders.orders_ordered_at_idx_ab3f861d",
+    "label": "Create index \"orders_ordered_at_idx_ab3f861d\" on \"orders\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "orders_ordered_at_idx_ab3f861d",
+        "table": "orders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"orders_ordered_at_idx_ab3f861d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"orders_ordered_at_idx_ab3f861d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"orders_ordered_at_idx_ab3f861d\"",
+        "sql": "CREATE INDEX \"orders_ordered_at_idx_ab3f861d\" ON \"public\".\"orders\" (\"ordered_at\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"orders_ordered_at_idx_ab3f861d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"orders_ordered_at_idx_ab3f861d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.sync_runs.sync_runs_entity_type_started_at_idx_f5f7693b",
+    "label": "Create index \"sync_runs_entity_type_started_at_idx_f5f7693b\" on \"sync_runs\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "sync_runs_entity_type_started_at_idx_f5f7693b",
+        "table": "sync_runs"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"sync_runs_entity_type_started_at_idx_f5f7693b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_runs_entity_type_started_at_idx_f5f7693b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"sync_runs_entity_type_started_at_idx_f5f7693b\"",
+        "sql": "CREATE INDEX \"sync_runs_entity_type_started_at_idx_f5f7693b\" ON \"public\".\"sync_runs\" (\"entity_type\", \"started_at\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"sync_runs_entity_type_started_at_idx_f5f7693b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sync_runs_entity_type_started_at_idx_f5f7693b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_insight_daily.ad_insight_daily_ad_id_fkey",
+    "label": "Add foreign key \"ad_insight_daily_ad_id_fkey\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_insight_daily_ad_id_fkey",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_insight_daily_ad_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_insight_daily_ad_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_insight_daily\"\nADD CONSTRAINT \"ad_insight_daily_ad_id_fkey\"\nFOREIGN KEY (\"ad_id\")\nREFERENCES \"public\".\"ads\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_insight_daily_ad_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_insight_daily.ad_insight_daily_campaign_id_fkey",
+    "label": "Add foreign key \"ad_insight_daily_campaign_id_fkey\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_insight_daily_campaign_id_fkey",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_insight_daily_campaign_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_campaign_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_insight_daily_campaign_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_insight_daily\"\nADD CONSTRAINT \"ad_insight_daily_campaign_id_fkey\"\nFOREIGN KEY (\"campaign_id\")\nREFERENCES \"public\".\"campaigns\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_insight_daily_campaign_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_campaign_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_insight_daily.ad_insight_daily_ad_set_id_fkey",
+    "label": "Add foreign key \"ad_insight_daily_ad_set_id_fkey\" on \"ad_insight_daily\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_insight_daily_ad_set_id_fkey",
+        "table": "ad_insight_daily"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_insight_daily_ad_set_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_insight_daily_ad_set_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_insight_daily\"\nADD CONSTRAINT \"ad_insight_daily_ad_set_id_fkey\"\nFOREIGN KEY (\"ad_set_id\")\nREFERENCES \"public\".\"ad_sets\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_insight_daily_ad_set_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_insight_daily_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ad_insight_daily\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_set_versions.ad_set_versions_ad_set_id_fkey",
+    "label": "Add foreign key \"ad_set_versions_ad_set_id_fkey\" on \"ad_set_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_set_versions_ad_set_id_fkey",
+        "table": "ad_set_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_set_versions_ad_set_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_set_versions_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ad_set_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_set_versions_ad_set_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_set_versions\"\nADD CONSTRAINT \"ad_set_versions_ad_set_id_fkey\"\nFOREIGN KEY (\"ad_set_id\")\nREFERENCES \"public\".\"ad_sets\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_set_versions_ad_set_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_set_versions_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ad_set_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_sets.ad_sets_campaign_id_fkey",
+    "label": "Add foreign key \"ad_sets_campaign_id_fkey\" on \"ad_sets\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_sets_campaign_id_fkey",
+        "table": "ad_sets"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_sets_campaign_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_sets_campaign_id_fkey",
+          "public",
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_sets_campaign_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_sets\"\nADD CONSTRAINT \"ad_sets_campaign_id_fkey\"\nFOREIGN KEY (\"campaign_id\")\nREFERENCES \"public\".\"campaigns\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_sets_campaign_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_sets_campaign_id_fkey",
+          "public",
+          "\"public\".\"ad_sets\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ad_versions.ad_versions_ad_id_fkey",
+    "label": "Add foreign key \"ad_versions_ad_id_fkey\" on \"ad_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ad_versions_ad_id_fkey",
+        "table": "ad_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ad_versions_ad_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_versions_ad_id_fkey",
+          "public",
+          "\"public\".\"ad_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ad_versions_ad_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ad_versions\"\nADD CONSTRAINT \"ad_versions_ad_id_fkey\"\nFOREIGN KEY (\"ad_id\")\nREFERENCES \"public\".\"ads\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ad_versions_ad_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ad_versions_ad_id_fkey",
+          "public",
+          "\"public\".\"ad_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ads.ads_ad_set_id_fkey",
+    "label": "Add foreign key \"ads_ad_set_id_fkey\" on \"ads\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ads_ad_set_id_fkey",
+        "table": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ads_ad_set_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ads_ad_set_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ads\"\nADD CONSTRAINT \"ads_ad_set_id_fkey\"\nFOREIGN KEY (\"ad_set_id\")\nREFERENCES \"public\".\"ad_sets\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ads_ad_set_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_ad_set_id_fkey",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ads.ads_campaign_id_fkey",
+    "label": "Add foreign key \"ads_campaign_id_fkey\" on \"ads\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ads_campaign_id_fkey",
+        "table": "ads"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ads_campaign_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_campaign_id_fkey",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ads_campaign_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ads\"\nADD CONSTRAINT \"ads_campaign_id_fkey\"\nFOREIGN KEY (\"campaign_id\")\nREFERENCES \"public\".\"campaigns\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ads_campaign_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ads_campaign_id_fkey",
+          "public",
+          "\"public\".\"ads\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.campaign_versions.campaign_versions_campaign_id_fkey",
+    "label": "Add foreign key \"campaign_versions_campaign_id_fkey\" on \"campaign_versions\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "campaign_versions_campaign_id_fkey",
+        "table": "campaign_versions"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"campaign_versions_campaign_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_versions_campaign_id_fkey",
+          "public",
+          "\"public\".\"campaign_versions\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"campaign_versions_campaign_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"campaign_versions\"\nADD CONSTRAINT \"campaign_versions_campaign_id_fkey\"\nFOREIGN KEY (\"campaign_id\")\nREFERENCES \"public\".\"campaigns\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"campaign_versions_campaign_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_versions_campaign_id_fkey",
+          "public",
+          "\"public\".\"campaign_versions\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.campaigns.campaigns_ad_account_id_fkey",
+    "label": "Add foreign key \"campaigns_ad_account_id_fkey\" on \"campaigns\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "campaigns_ad_account_id_fkey",
+        "table": "campaigns"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"campaigns_ad_account_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaigns_ad_account_id_fkey",
+          "public",
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"campaigns_ad_account_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"campaigns\"\nADD CONSTRAINT \"campaigns_ad_account_id_fkey\"\nFOREIGN KEY (\"ad_account_id\")\nREFERENCES \"public\".\"ad_accounts\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"campaigns_ad_account_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaigns_ad_account_id_fkey",
+          "public",
+          "\"public\".\"campaigns\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.sync_cursors.sync_cursors_ad_account_id_fkey",
+    "label": "Add foreign key \"sync_cursors_ad_account_id_fkey\" on \"sync_cursors\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "sync_cursors_ad_account_id_fkey",
+        "table": "sync_cursors"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"sync_cursors_ad_account_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sync_cursors_ad_account_id_fkey",
+          "public",
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"sync_cursors_ad_account_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"sync_cursors\"\nADD CONSTRAINT \"sync_cursors_ad_account_id_fkey\"\nFOREIGN KEY (\"ad_account_id\")\nREFERENCES \"public\".\"ad_accounts\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"sync_cursors_ad_account_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sync_cursors_ad_account_id_fkey",
+          "public",
+          "\"public\".\"sync_cursors\""
+        ]
+      }
+    ]
+  }
+]
