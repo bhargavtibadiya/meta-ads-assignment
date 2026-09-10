@@ -1,122 +1,1055 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Meta Ads pipeline</title>
-    <!--
-      Exception: this is a single static ops page served by the backend, not the
-      portfolio frontend. Inline CSS avoids a Tailwind build pipeline for one file.
-    -->
-    <style>
-      :root {
-        --ink: #1d1d1b;
-        --paper: #f2e8d8;
-        --muted: #6b6458;
-        --line: #1d1d1b;
-        --vermillion: #c23a22;
-      }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: Georgia, 'Times New Roman', serif;
-        background: var(--paper);
-        color: var(--ink);
-        padding: 32px;
-      }
-      h1 { font-size: 1.75rem; margin: 0 0 8px; }
-      p { max-width: 42rem; line-height: 1.5; color: var(--muted); }
-      .row { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
-      button {
-        font: inherit;
-        background: var(--ink);
-        color: var(--paper);
-        border: 1px solid var(--ink);
-        padding: 10px 16px;
-        cursor: pointer;
-      }
-      button:hover { background: var(--vermillion); border-color: var(--vermillion); }
-      button:disabled { opacity: 0.5; cursor: wait; }
-      dl {
-        display: grid;
-        grid-template-columns: max-content 1fr;
-        gap: 6px 16px;
-        max-width: 42rem;
-      }
-      dt { font-weight: 700; }
-      dd { margin: 0; }
-      pre {
-        background: #efe4d0;
-        border: 1px solid var(--line);
-        padding: 12px;
-        overflow: auto;
-        max-width: 56rem;
-        font-size: 0.85rem;
-      }
-      .ok { color: #1f6b3a; }
-      .err { color: var(--vermillion); }
-    </style>
-  </head>
-  <body>
-    <h1>Meta Ads pipeline</h1>
-    <p>
-      Fixture-backed sync and orders import. Health check:
-      <a href="/health">/health</a>.
-    </p>
 
-    <div class="row">
-      <button type="button" id="sync-btn">Run sync</button>
-      <button type="button" id="import-btn">Import orders</button>
-      <button type="button" id="refresh-btn">Refresh status</button>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meta Ads Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Nunito+Sans:wght@700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <!--
+      Exception: this is a single static ops page served by Express, not the
+      Next.js app. Named classes live here so the page can follow Capsule
+      without a Tailwind pipeline.
+    -->
+  <style>
+    :root {
+      --color-bg-base: #0d1117;
+      --color-bg-surface: #161b22;
+      --color-bg-elevated: #21262d;
+      --color-bg-sunken: #0a0d12;
+      --color-blue-100: rgba(88, 166, 255, 0.08);
+      --color-blue-200: rgba(88, 166, 255, 0.15);
+      --color-blue-300: #79b8ff;
+      --color-blue-400: #58a6ff;
+      --color-blue-glow: 0 4px 16px rgba(88, 166, 255, 0.25);
+      --color-text-primary: #e6edf3;
+      --color-text-secondary: #c9d1d9;
+      --color-text-tertiary: #8b949e;
+      --color-text-muted: #484f58;
+      --color-text-inverse: #0d1117;
+      --color-text-placeholder: #484f58;
+      --color-border-light: #21262d;
+      --color-border-medium: #30363d;
+      --color-success: #3fb950;
+      --color-success-bg: rgba(63, 185, 80, 0.15);
+      --color-warning: #d29922;
+      --color-warning-bg: rgba(210, 153, 34, 0.15);
+      --color-error: #f85149;
+      --color-error-bg: rgba(248, 81, 73, 0.15);
+      --color-info: #58a6ff;
+      --color-info-bg: rgba(88, 166, 255, 0.15);
+      --color-purple: #bc8cff;
+      --color-purple-bg: rgba(188, 140, 255, 0.15);
+      --font-display: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+      --font-body: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Cascadia Code', Consolas, monospace;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      font-weight: 400;
+    }
+
+    a {
+      color: var(--color-blue-400);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--color-blue-300);
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.875rem, 4vw, 2.75rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin: 0 0 8px;
+    }
+
+    h1 .accent {
+      color: var(--color-blue-400);
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 36rem;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text-tertiary);
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-full);
+      padding: 3px 12px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-neutral {
+      background: var(--color-bg-elevated);
+      color: var(--color-text-tertiary);
+      border: 1px solid var(--color-border-medium);
+    }
+
+    .badge-info {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    .badge-success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    .badge-error {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+    }
+
+    .badge-warning {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-success);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .live-dot.is-down {
+      background: var(--color-error);
+      animation: none;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .flash {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-medium);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .flash.is-visible {
+      display: flex;
+    }
+
+    .flash.is-ok {
+      border-color: rgba(63, 185, 80, 0.30);
+      color: var(--color-success);
+    }
+
+    .flash.is-err {
+      border-color: rgba(248, 81, 73, 0.30);
+      color: var(--color-error);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card,
+    .card {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border-medium);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 1.875rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border-light);
+      padding-bottom: 8px;
+      margin: 0 0 20px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--color-blue-400);
+      outline-offset: 2px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: var(--radius-full);
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border: 1px solid transparent;
+      transition: background 200ms ease-out, box-shadow 200ms ease-out, transform 50ms linear, opacity 200ms ease-out;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .btn.is-loading {
+      opacity: 0.70;
+      pointer-events: none;
+    }
+
+    .btn-primary {
+      background: var(--color-blue-400);
+      color: var(--color-text-inverse);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--color-blue-300);
+      box-shadow: var(--color-blue-glow);
+    }
+
+    .btn-secondary {
+      background: var(--color-bg-elevated);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-medium);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--color-border-medium);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--color-blue-400);
+      border: 1.5px solid var(--color-blue-400);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: var(--color-blue-100);
+    }
+
+    .btn-sm {
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: minmax(140px, 180px) 1fr;
+      gap: 0;
+    }
+
+    .kv-row {
+      display: contents;
+    }
+
+    .kv-row dt,
+    .kv-row dd {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border-light);
+      font-size: 14px;
+    }
+
+    .kv-row:last-child dt,
+    .kv-row:last-child dd {
+      border-bottom: none;
+    }
+
+    .kv-row dt {
+      color: var(--color-text-tertiary);
+      font-weight: 500;
+    }
+
+    .kv-row dd {
+      margin: 0;
+      color: var(--color-text-primary);
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .kv-row dd.mono {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--color-blue-400);
+    }
+
+    .run-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .run-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+    }
+
+    .run-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .run-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    .inspector-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-wrap {
+      flex: 1 1 220px;
+      min-width: 180px;
+    }
+
+    .search-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .input {
+      width: 100%;
+      background: var(--color-bg-base);
+      border: 1.5px solid var(--color-border-medium);
+      border-radius: var(--radius-full);
+      padding: 10px 18px;
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 400;
+      outline: none;
+      transition: border-color 200ms ease-out, box-shadow 200ms ease-out;
+    }
+
+    .input::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    .input:hover {
+      border-color: var(--color-text-muted);
+    }
+
+    .input:focus {
+      border-color: var(--color-blue-400);
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .json-shell {
+      background: var(--color-bg-sunken);
+      border: 1px solid var(--color-border-medium);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      min-height: 220px;
+      max-height: 560px;
+      overflow-y: auto;
+    }
+
+    .json-tree {
+      padding: 12px 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .json-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      cursor: default;
+    }
+
+    .json-row.is-branch {
+      cursor: pointer;
+    }
+
+    .json-row:hover {
+      background: var(--color-bg-elevated);
+    }
+
+    .json-caret {
+      flex: 0 0 16px;
+      width: 16px;
+      height: 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--color-text-tertiary);
+      font-size: 10px;
+      line-height: 18px;
+      text-align: center;
+    }
+
+    .json-caret[aria-expanded="true"] {
+      color: var(--color-blue-400);
+    }
+
+    .json-key {
+      color: var(--color-blue-300);
+    }
+
+    .json-colon {
+      color: var(--color-text-muted);
+      margin: 0 4px 0 2px;
+    }
+
+    .json-meta {
+      color: var(--color-text-muted);
+    }
+
+    .json-string {
+      color: var(--color-success);
+    }
+
+    .json-number {
+      color: var(--color-blue-400);
+    }
+
+    .json-boolean {
+      color: var(--color-purple);
+    }
+
+    .json-null {
+      color: var(--color-text-tertiary);
+    }
+
+    .json-mark {
+      background: var(--color-blue-200);
+      color: var(--color-text-primary);
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+
+    .json-empty {
+      padding: 32px 20px;
+      text-align: center;
+      color: var(--color-text-tertiary);
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+
+    .json-raw {
+      margin: 0;
+      padding: 16px 18px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1023px) {
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 24px 16px 48px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card,
+      .card {
+        padding: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .page-header {
+        margin-bottom: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot {
+        animation: none;
+      }
+
+      .btn,
+      .input {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <div class="eyebrow">Operations</div>
+        <h1><span class="accent">Meta Ads</span> Pipeline</h1>
+        <p class="lede">
+          Fixture-backed sync into Postgres, then chart in Metabase.
+          Run the pipeline here, then inspect the exact JSON the API returned.
+        </p>
+      </div>
+      <div class="header-meta">
+        <span class="badge badge-info" id="source-badge">Fixtures</span>
+        <span class="badge badge-neutral" id="health-badge">
+          <span class="live-dot" id="health-dot" aria-hidden="true"></span>
+          Health
+        </span>
+        <a class="badge badge-neutral" href="/health">/health</a>
+        <a class="badge badge-neutral" href="http://localhost:3000" target="_blank" rel="noreferrer">Metabase</a>
+      </div>
+    </header>
+
+    <div class="flash" id="flash" role="status"></div>
+
+    <section class="stats" aria-label="Pipeline snapshot">
+      <article class="stat-card">
+        <div class="stat-label">Insight rows</div>
+        <div class="stat-value" id="stat-insights">n/a</div>
+        <div class="stat-hint" id="stat-window">Insights window unknown</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Synced through</div>
+        <div class="stat-value" id="stat-through">n/a</div>
+        <div class="stat-hint" id="stat-last">Last success unknown</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Hierarchy</div>
+        <div class="stat-value" id="stat-hierarchy">n/a</div>
+        <div class="stat-hint" id="stat-hierarchy-hint">Last hierarchy run</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Insights run</div>
+        <div class="stat-value" id="stat-insights-run">n/a</div>
+        <div class="stat-hint" id="stat-insights-hint">Last insights upsert</div>
+      </article>
+    </section>
+
+    <div class="layout">
+      <section class="card" aria-labelledby="overview-title">
+        <h2 class="section-title" id="overview-title">Sync overview</h2>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="sync-btn">Run sync</button>
+          <button type="button" class="btn btn-secondary" id="import-btn">Import orders</button>
+          <button type="button" class="btn btn-outline" id="refresh-btn">Refresh status</button>
+        </div>
+        <dl class="kv" id="status-dl">
+          <div class="kv-row">
+            <dt>Status</dt>
+            <dd>Fetching /api/sync/status</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card" aria-labelledby="runs-title">
+        <h2 class="section-title" id="runs-title">Last runs</h2>
+        <div class="run-list" id="run-list">
+          <div class="run-pill">
+            <span class="run-name">Waiting for status</span>
+            <span class="badge badge-neutral">Idle</span>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <p id="flash" role="status"></p>
+    <section class="card" aria-labelledby="inspector-title">
+      <h2 class="section-title" id="inspector-title">Response inspector</h2>
+      <div class="inspector-toolbar">
+        <div class="search-wrap">
+          <label class="search-label" for="json-search">Search keys and values</label>
+          <input class="input" id="json-search" type="search" placeholder="Filter JSON, e.g. insightRowCount"
+            autocomplete="off" />
+        </div>
+        <div class="toolbar-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="expand-btn">Expand all</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="collapse-btn">Collapse all</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="raw-btn" aria-pressed="false">View raw</button>
+          <button type="button" class="btn btn-outline btn-sm" id="copy-btn">Copy JSON</button>
+        </div>
+      </div>
+      <div class="json-shell" id="json-shell">
+        <div class="json-empty" id="json-empty">No payload yet. Run sync, import orders, or refresh status.</div>
+        <div class="json-tree hidden" id="json-tree" role="tree" aria-label="JSON tree"></div>
+        <pre class="json-raw hidden" id="json-raw"></pre>
+      </div>
+    </section>
+  </div>
 
-    <h2>Sync status</h2>
-    <dl id="status-dl">
-      <dt>Loading</dt>
-      <dd>Fetching /api/sync/status</dd>
-    </dl>
-
-    <h2>Last response</h2>
-    <pre id="output">No action yet.</pre>
-
-    <script>
-      const flash = document.getElementById('flash');
-      const output = document.getElementById('output');
-      const statusDl = document.getElementById('status-dl');
+  <script>
+    (function () {
+      const flashEl = document.getElementById('flash');
       const syncBtn = document.getElementById('sync-btn');
       const importBtn = document.getElementById('import-btn');
       const refreshBtn = document.getElementById('refresh-btn');
+      const expandBtn = document.getElementById('expand-btn');
+      const collapseBtn = document.getElementById('collapse-btn');
+      const rawBtn = document.getElementById('raw-btn');
+      const copyBtn = document.getElementById('copy-btn');
+      const searchInput = document.getElementById('json-search');
+      const treeEl = document.getElementById('json-tree');
+      const rawEl = document.getElementById('json-raw');
+      const emptyEl = document.getElementById('json-empty');
+      const statusDl = document.getElementById('status-dl');
+      const runList = document.getElementById('run-list');
+      const sourceBadge = document.getElementById('source-badge');
+      const healthBadge = document.getElementById('health-badge');
+      const healthDot = document.getElementById('health-dot');
 
-      function setBusy(busy) {
-        syncBtn.disabled = busy;
-        importBtn.disabled = busy;
-        refreshBtn.disabled = busy;
+      const actionButtons = [syncBtn, importBtn, refreshBtn];
+
+      let currentPayload = null;
+      let showRaw = false;
+      let query = '';
+      const expanded = new Set();
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function highlight(text, needle) {
+        const safe = escapeHtml(text);
+        if (!needle) return safe;
+        const escapedNeedle = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const matcher = new RegExp('(' + escapedNeedle + ')', 'ig');
+        return safe.replace(matcher, '<mark class="json-mark">$1</mark>');
+      }
+
+      function isObject(value) {
+        return value !== null && typeof value === 'object';
+      }
+
+      function pathId(parts) {
+        return parts.map(encodeURIComponent).join('/');
+      }
+
+      function collectBranchPaths(value, parts, into) {
+        if (!isObject(value)) return;
+        into.add(pathId(parts));
+        if (Array.isArray(value)) {
+          value.forEach(function (item, index) {
+            collectBranchPaths(item, parts.concat(String(index)), into);
+          });
+          return;
+        }
+        Object.keys(value).forEach(function (key) {
+          collectBranchPaths(value[key], parts.concat(key), into);
+        });
+      }
+
+      function expandDefault(value) {
+        expanded.clear();
+        expanded.add(pathId([]));
+        if (!isObject(value)) return;
+        if (Array.isArray(value)) return;
+        Object.keys(value).forEach(function (key) {
+          const child = value[key];
+          if (isObject(child)) expanded.add(pathId([key]));
+        });
+      }
+
+      function valueMatches(key, value, needle) {
+        if (!needle) return true;
+        const haystack = (key + ' ' + stringifyPreview(value)).toLowerCase();
+        return haystack.indexOf(needle) !== -1;
+      }
+
+      function nodeMatches(key, value, needle) {
+        if (!needle) return true;
+        if (valueMatches(key, value, needle)) return true;
+        if (!isObject(value)) return false;
+        if (Array.isArray(value)) {
+          return value.some(function (item, index) {
+            return nodeMatches(String(index), item, needle);
+          });
+        }
+        return Object.keys(value).some(function (childKey) {
+          return nodeMatches(childKey, value[childKey], needle);
+        });
+      }
+
+      function stringifyPreview(value) {
+        if (value === null) return 'null';
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+        if (Array.isArray(value)) return '[' + value.length + ']';
+        return '{' + Object.keys(value).length + '}';
+      }
+
+      function renderLeaf(value, needle) {
+        if (value === null) {
+          return '<span class="json-null">' + highlight('null', needle) + '</span>';
+        }
+        if (typeof value === 'string') {
+          return '<span class="json-string">"' + highlight(value, needle) + '"</span>';
+        }
+        if (typeof value === 'number') {
+          return '<span class="json-number">' + highlight(String(value), needle) + '</span>';
+        }
+        if (typeof value === 'boolean') {
+          return '<span class="json-boolean">' + highlight(String(value), needle) + '</span>';
+        }
+        return '<span class="json-null">' + highlight(String(value), needle) + '</span>';
+      }
+
+      function renderNode(key, value, parts, needle) {
+        if (needle && !nodeMatches(key, value, needle)) return '';
+
+        const id = pathId(parts);
+        const indent = Math.max(parts.length, 0) * 14;
+        const label = key === '' ? 'root' : key;
+
+        if (!isObject(value)) {
+          return (
+            '<div class="json-row" role="treeitem" style="padding-left:' + (10 + indent) + 'px">' +
+            '<span class="json-caret" aria-hidden="true"></span>' +
+            '<span class="json-key">' + highlight(label, needle) + '</span>' +
+            '<span class="json-colon">:</span>' +
+            renderLeaf(value, needle) +
+            '</div>'
+          );
+        }
+
+        const size = Array.isArray(value) ? value.length : Object.keys(value).length;
+        const meta = Array.isArray(value) ? '[' + size + ']' : '{' + size + '}';
+        const isOpen = expanded.has(id) || Boolean(needle);
+        const caret = isOpen ? '▾' : '▸';
+
+        let html =
+          '<div class="json-node" data-path="' + escapeHtml(id) + '">' +
+          '<div class="json-row is-branch" role="treeitem" aria-expanded="' + String(isOpen) + '" data-toggle="' + escapeHtml(id) + '" style="padding-left:' + (10 + indent) + 'px">' +
+          '<button type="button" class="json-caret" aria-expanded="' + String(isOpen) + '" tabindex="-1">' + caret + '</button>' +
+          '<span class="json-key">' + highlight(label, needle) + '</span>' +
+          '<span class="json-colon">:</span>' +
+          '<span class="json-meta">' + meta + '</span>' +
+          '</div>';
+
+        if (isOpen) {
+          if (Array.isArray(value)) {
+            value.forEach(function (item, index) {
+              html += renderNode(String(index), item, parts.concat(String(index)), needle);
+            });
+          } else {
+            Object.keys(value).forEach(function (childKey) {
+              html += renderNode(childKey, value[childKey], parts.concat(childKey), needle);
+            });
+          }
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      function paintInspector() {
+        if (currentPayload === null) {
+          emptyEl.classList.remove('hidden');
+          treeEl.classList.add('hidden');
+          rawEl.classList.add('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+        const pretty = JSON.stringify(currentPayload, null, 2);
+        rawEl.textContent = pretty;
+
+        if (showRaw) {
+          treeEl.classList.add('hidden');
+          rawEl.classList.remove('hidden');
+          if (query) {
+            rawEl.innerHTML = highlight(pretty, query);
+          }
+          return;
+        }
+
+        rawEl.classList.add('hidden');
+        treeEl.classList.remove('hidden');
+        treeEl.innerHTML = renderNode('root', currentPayload, [], query.toLowerCase());
+      }
+
+      function setPayload(payload) {
+        currentPayload = payload;
+        expandDefault(payload);
+        paintInspector();
       }
 
       function showFlash(message, isError) {
-        flash.textContent = message;
-        flash.className = isError ? 'err' : 'ok';
+        flashEl.textContent = message;
+        flashEl.classList.add('is-visible');
+        flashEl.classList.toggle('is-err', Boolean(isError));
+        flashEl.classList.toggle('is-ok', !isError);
       }
 
-      function renderStatus(payload) {
-        const data = payload && payload.data ? payload.data : {};
+      function setBusy(busy, loadingLabel) {
+        actionButtons.forEach(function (button) {
+          button.disabled = busy;
+          button.classList.toggle('is-loading', busy && button === loadingLabel);
+        });
+        if (busy && loadingLabel) {
+          loadingLabel.dataset.original = loadingLabel.textContent;
+          loadingLabel.textContent = 'Loading...';
+        } else {
+          actionButtons.forEach(function (button) {
+            if (button.dataset.original) {
+              button.textContent = button.dataset.original;
+              delete button.dataset.original;
+            }
+          });
+        }
+      }
+
+      function statusClass(status) {
+        if (status === 'SUCCESS') return 'badge-success';
+        if (status === 'FAILED') return 'badge-error';
+        return 'badge-neutral';
+      }
+
+      function dash(value) {
+        if (value === null || value === undefined || value === '') return 'n/a';
+        return String(value);
+      }
+
+      function renderOverview(data) {
         const hierarchy = data.lastHierarchyRun || {};
         const insights = data.lastInsightsRun || {};
-        statusDl.innerHTML = [
-          ['Data source', data.dataSource || '—'],
-          ['Last successful sync', data.lastSuccessfulSyncAt || '—'],
-          ['Synced through date', data.lastSyncedThroughDate || '—'],
-          ['Insight rows', String(data.insightRowCount ?? '—')],
-          ['Last hierarchy', (hierarchy.status || '—') + ' / ' + (hierarchy.rowsUpserted ?? '—') + ' rows'],
-          ['Last insights', (insights.status || '—') + ' / ' + (insights.rowsUpserted ?? '—') + ' rows'],
-          ['Insights window', (insights.windowStart || '—') + ' → ' + (insights.windowEnd || '—')],
-        ]
-          .map(function (pair) {
-            return '<dt>' + pair[0] + '</dt><dd>' + pair[1] + '</dd>';
+        const rows = [
+          ['Data source', data.dataSource || 'n/a', false],
+          ['Last successful sync', data.lastSuccessfulSyncAt || 'n/a', true],
+          ['Synced through date', data.lastSyncedThroughDate || 'n/a', true],
+          ['Insight rows', dash(data.insightRowCount), false],
+          ['Insights window', dash(insights.windowStart) + ' → ' + dash(insights.windowEnd), true],
+          ['Hierarchy error', hierarchy.errorMessage || 'None', false],
+          ['Insights error', insights.errorMessage || 'None', false],
+        ];
+
+        statusDl.innerHTML = rows
+          .map(function (row) {
+            const mono = row[2] ? ' class="mono"' : '';
+            return (
+              '<div class="kv-row"><dt>' +
+              escapeHtml(row[0]) +
+              '</dt><dd' +
+              mono +
+              '>' +
+              escapeHtml(row[1]) +
+              '</dd></div>'
+            );
           })
           .join('');
+
+        document.getElementById('stat-insights').textContent = dash(data.insightRowCount);
+        document.getElementById('stat-through').textContent = dash(data.lastSyncedThroughDate);
+        document.getElementById('stat-last').textContent = data.lastSuccessfulSyncAt
+          ? 'Last success ' + data.lastSuccessfulSyncAt
+          : 'No successful sync yet';
+        document.getElementById('stat-window').textContent = insights.windowStart
+          ? dash(insights.windowStart) + ' → ' + dash(insights.windowEnd)
+          : 'No insights window yet';
+        document.getElementById('stat-hierarchy').textContent = dash(hierarchy.status);
+        document.getElementById('stat-hierarchy-hint').textContent =
+          dash(hierarchy.rowsUpserted) + ' rows upserted';
+        document.getElementById('stat-insights-run').textContent = dash(insights.status);
+        document.getElementById('stat-insights-hint').textContent =
+          dash(insights.rowsUpserted) + ' rows upserted';
+
+        sourceBadge.textContent = data.dataSource === 'live' ? 'Live' : 'Fixtures';
+
+        function runRow(title, run) {
+          if (!run) {
+            return (
+              '<div class="run-pill"><span class="run-name">' +
+              escapeHtml(title) +
+              '</span><span class="badge badge-neutral">None</span></div>'
+            );
+          }
+          return (
+            '<div class="run-pill">' +
+            '<div><div class="run-name">' +
+            escapeHtml(title) +
+            '</div><div class="run-meta">' +
+            escapeHtml(dash(run.rowsUpserted) + ' rows · ' + dash(run.finishedAt)) +
+            '</div></div>' +
+            '<span class="badge ' +
+            statusClass(run.status) +
+            '">' +
+            escapeHtml(run.status || 'Unknown') +
+            '</span></div>'
+          );
+        }
+
+        runList.innerHTML =
+          runRow('Hierarchy', hierarchy.status ? hierarchy : null) +
+          runRow('Insights', insights.status ? insights : null);
       }
 
       async function parseJson(response) {
@@ -128,16 +1061,36 @@
         }
       }
 
+      async function refreshHealth() {
+        try {
+          const response = await fetch('/health');
+          const body = await parseJson(response);
+          const ok = response.ok && body && body.success !== false;
+          healthDot.classList.toggle('is-down', !ok);
+          healthBadge.className = 'badge ' + (ok ? 'badge-success' : 'badge-error');
+          healthBadge.innerHTML =
+            '<span class="live-dot' +
+            (ok ? '' : ' is-down') +
+            '" aria-hidden="true"></span>' +
+            (ok ? 'Healthy' : 'Down');
+        } catch (_error) {
+          healthDot.classList.add('is-down');
+          healthBadge.className = 'badge badge-error';
+          healthBadge.innerHTML = '<span class="live-dot is-down" aria-hidden="true"></span>Down';
+        }
+      }
+
       async function refreshStatus() {
         const response = await fetch('/api/sync/status');
         const body = await parseJson(response);
-        renderStatus(body);
+        const data = body && body.data ? body.data : {};
+        renderOverview(data);
         return body;
       }
 
-      async function post(path, label) {
-        setBusy(true);
-        showFlash(label + '…', false);
+      async function post(path, label, button) {
+        setBusy(true, button);
+        showFlash(label + '...', false);
         try {
           const response = await fetch(path, {
             method: 'POST',
@@ -145,45 +1098,105 @@
             body: '{}',
           });
           const body = await parseJson(response);
-          output.textContent = JSON.stringify(body, null, 2);
+          setPayload(body);
           if (!response.ok || body.success === false) {
             showFlash(label + ' failed', true);
           } else {
             showFlash(label + ' complete', false);
           }
           await refreshStatus();
+          await refreshHealth();
         } catch (error) {
           showFlash(label + ' failed', true);
-          output.textContent = String(error);
+          setPayload({ success: false, error: String(error) });
         } finally {
           setBusy(false);
         }
       }
 
+      treeEl.addEventListener('click', function (event) {
+        const row = event.target.closest('[data-toggle]');
+        if (!row) return;
+        const id = row.getAttribute('data-toggle');
+        if (!id) return;
+        if (expanded.has(id)) expanded.delete(id);
+        else expanded.add(id);
+        paintInspector();
+      });
+
+      expandBtn.addEventListener('click', function () {
+        if (currentPayload === null) return;
+        collectBranchPaths(currentPayload, [], expanded);
+        paintInspector();
+      });
+
+      collapseBtn.addEventListener('click', function () {
+        expanded.clear();
+        expanded.add(pathId([]));
+        paintInspector();
+      });
+
+      rawBtn.addEventListener('click', function () {
+        showRaw = !showRaw;
+        rawBtn.setAttribute('aria-pressed', String(showRaw));
+        rawBtn.textContent = showRaw ? 'View tree' : 'View raw';
+        paintInspector();
+      });
+
+      copyBtn.addEventListener('click', async function () {
+        if (currentPayload === null) return;
+        const text = JSON.stringify(currentPayload, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+          showFlash('JSON copied', false);
+        } catch (_error) {
+          showFlash('Copy failed', true);
+        }
+      });
+
+      let searchTimer = 0;
+      searchInput.addEventListener('input', function () {
+        window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(function () {
+          query = searchInput.value.trim();
+          if (query && currentPayload !== null) {
+            collectBranchPaths(currentPayload, [], expanded);
+          }
+          paintInspector();
+        }, 120);
+      });
+
       syncBtn.addEventListener('click', function () {
-        post('/api/sync/run', 'Sync');
+        post('/api/sync/run', 'Sync', syncBtn);
       });
       importBtn.addEventListener('click', function () {
-        post('/api/orders/import', 'Import');
+        post('/api/orders/import', 'Import', importBtn);
       });
       refreshBtn.addEventListener('click', async function () {
-        setBusy(true);
+        setBusy(true, refreshBtn);
         try {
           const body = await refreshStatus();
-          output.textContent = JSON.stringify(body, null, 2);
+          setPayload(body);
+          await refreshHealth();
           showFlash('Status refreshed', false);
         } catch (error) {
           showFlash('Status refresh failed', true);
-          output.textContent = String(error);
+          setPayload({ success: false, error: String(error) });
         } finally {
           setBusy(false);
         }
       });
 
-      refreshStatus().catch(function (error) {
-        showFlash('Could not load status', true);
-        output.textContent = String(error);
-      });
-    </script>
-  </body>
+      Promise.all([refreshStatus(), refreshHealth()])
+        .then(function (results) {
+          setPayload(results[0]);
+        })
+        .catch(function (error) {
+          showFlash('Could not load status', true);
+          setPayload({ success: false, error: String(error) });
+        });
+    })();
+  </script>
+</body>
+
 </html>
