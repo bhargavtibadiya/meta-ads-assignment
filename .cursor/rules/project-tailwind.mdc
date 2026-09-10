@@ -1,0 +1,34 @@
+---
+description: Tailwind-first styling for the Bhargav Portfolio broadsheet
+alwaysApply: true
+---
+
+# Project styling — Tailwind only
+
+This portfolio uses **Tailwind CSS v4** (`@import "tailwindcss"` + `@theme inline` in `app/globals.css`).
+
+## Do
+
+- Put presentation on `className` with Tailwind utilities.
+- Use semantic tokens: `text-ink`, `text-body`, `bg-ink`, `bg-paper`, `border-ink`, `font-display`, `font-body`.
+- Prefer mobile-first responsive utilities (`md:`, `lg:`).
+- Follow `docs/rules/project-rules.md` for full project law.
+
+## Do not
+
+- Do **not** add `<style>{\`...\`}</style>` (or styled-jsx) inside React components.
+- Do **not** duplicate the same rules in both Tailwind and a component style tag.
+
+## Exceptions
+
+Only in `app/globals.css`, as named classes: keyframes, sibling/complex selectors, container-query type (`cqi`), paper grain, scroll-snap bands. Reference those class names from JSX; never inline the CSS in the component.
+
+```tsx
+// ❌ BAD
+<section>
+  <style>{`.foo { margin: 32px; }`}</style>
+</section>
+
+// ✅ GOOD
+<section className="mx-8 border-y border-ink py-8">
+```

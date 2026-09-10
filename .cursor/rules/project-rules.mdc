@@ -1,0 +1,86 @@
+---
+description: Portfolio project rules — Tailwind-first styling, design tokens, and component conventions
+alwaysApply: true
+---
+
+# Project Rules — Bhargav Portfolio
+
+Single source of truth for how this Next.js broadsheet portfolio is built. Agents and humans follow these rules on every change.
+
+---
+
+## 1. Styling: Tailwind first, always
+
+This project uses **Tailwind CSS v4** configured in `app/globals.css` via `@import "tailwindcss"` and `@theme inline`. There is no `tailwind.config.*`.
+
+### Required
+
+- Style UI with **Tailwind utility classes** on JSX elements (`className`).
+- Prefer semantic theme tokens already mapped in `@theme inline`:
+  - Colors: `text-ink`, `text-body`, `text-muted`, `text-cream`, `bg-ink`, `bg-paper`, `bg-secondary`, `bg-vermillion`, `border-ink`
+  - Fonts: `font-display` (Gloock), `font-body` (Cormorant), `font-canterbury`, `font-melodrama`
+- Use responsive prefixes (`md:`, `lg:`) for major breakpoints. Mobile-first.
+- Keep hover/focus states in Tailwind (`hover:`, `focus-visible:`).
+
+### Forbidden
+
+- **Never** add a React `<style>{{\`...\`}}</style>` (or `<style jsx>`) block inside a component.
+- **Never** invent a parallel CSS-in-JS or styled-components layer for layout that Tailwind can express.
+- **Never** leave dead duplicate rules: if a band is converted to Tailwind, remove the matching unused class block from `globals.css`.
+
+### Allowed exceptions (globals.css only)
+
+Put these in `app/globals.css` as named classes — not in component `<style>` tags:
+
+| Exception | Why |
+|---|---|
+| `@keyframes` / infinite marquees | Tailwind cannot own keyframe timelines cleanly |
+| Sibling / complex selectors (`:hover ~`, `nth-child` stacks) | Testimonial fan-out, ring stroke offsets |
+| Container-query type (`cqi`) and `::after` hairlines | Intro / manifesto lockups |
+| Paper grain (`--paper-fiber`, `--paper-grain`) and base resets | Global document chrome |
+| Scroll-snap work slider chrome | Multi-property band layout |
+
+When you need an exception: add or update a **named class** in `globals.css`, then reference that single class name from the component. Document the why in a one-line comment above the class.
+
+### Arbitrary values
+
+Use arbitrary values sparingly when a token does not exist yet, e.g. `text-[clamp(1.05rem,1.8vw,1.35rem)]`. Prefer adding a token to `@theme inline` if the same value repeats three or more times.
+
+---
+
+## 2. Design system alignment
+
+- Tokens and visual law live in `docs/design-system/broadsheet-design-system.md` and `docs/design-system/broadsheet-instructions.md`.
+- Implementation law for this repo is **this file** plus Cursor rules under `.cursor/rules/`.
+- Ink is `#1d1d1b` (never pure `#000`). Paper is `#f2e8d8`. Vermillion is rationed.
+- No em dashes in user-facing copy.
+
+---
+
+## 3. Components
+
+- Prefer Tailwind on `components/ui/*` and `components/layout/*` for all new work.
+- Homepage bands in `components/home/*` should use Tailwind for spacing, borders, typography, and flex/grid. Keep only the documented exceptions in `globals.css`.
+- Match existing patterns in neighboring files before inventing new class recipes.
+
+---
+
+## 4. Responsive and accessibility
+
+- Design for mobile, tablet, and desktop. Test at ~375px, ~768px, and ~1280px+.
+- Preserve `prefers-reduced-motion` behavior for marquees and hover transforms (in `globals.css` or Tailwind `motion-reduce:`).
+- Keep focus-visible outlines on interactive controls.
+- Decorative images need meaningful `alt` or `aria-hidden` as appropriate.
+
+---
+
+## 5. Related rules
+
+| File | Covers |
+|---|---|
+| `docs/rules/typescript-standards.md` | Strict TypeScript |
+| `docs/rules/commit.md` | Conventional commits |
+| `docs/rules/frontend-folder-structure.md` | Folder layout |
+| `docs/rules/comments.md` | Comment formats |
+
+When styling conflicts with another rule, **Tailwind-first project styling wins** for presentation; TypeScript and commit rules still apply unchanged.
