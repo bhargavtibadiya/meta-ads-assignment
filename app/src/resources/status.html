@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meta Ads pipeline</title>
+    <!--
+      Exception: this is a single static ops page served by the backend, not the
+      portfolio frontend. Inline CSS avoids a Tailwind build pipeline for one file.
+    -->
+    <style>
+      :root {
+        --ink: #1d1d1b;
+        --paper: #f2e8d8;
+        --muted: #6b6458;
+        --line: #1d1d1b;
+        --vermillion: #c23a22;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', serif;
+        background: var(--paper);
+        color: var(--ink);
+        padding: 32px;
+      }
+      h1 { font-size: 1.75rem; margin: 0 0 8px; }
+      p { max-width: 42rem; line-height: 1.5; color: var(--muted); }
+      .row { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+      button {
+        font: inherit;
+        background: var(--ink);
+        color: var(--paper);
+        border: 1px solid var(--ink);
+        padding: 10px 16px;
+        cursor: pointer;
+      }
+      button:hover { background: var(--vermillion); border-color: var(--vermillion); }
+      button:disabled { opacity: 0.5; cursor: wait; }
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 6px 16px;
+        max-width: 42rem;
+      }
+      dt { font-weight: 700; }
+      dd { margin: 0; }
+      pre {
+        background: #efe4d0;
+        border: 1px solid var(--line);
+        padding: 12px;
+        overflow: auto;
+        max-width: 56rem;
+        font-size: 0.85rem;
+      }
+      .ok { color: #1f6b3a; }
+      .err { color: var(--vermillion); }
+    </style>
+  </head>
+  <body>
+    <h1>Meta Ads pipeline</h1>
+    <p>
+      Fixture-backed sync and orders import. Health check:
+      <a href="/health">/health</a>.
+    </p>
+
+    <div class="row">
+      <button type="button" id="sync-btn">Run sync</button>
+      <button type="button" id="import-btn">Import orders</button>
+      <button type="button" id="refresh-btn">Refresh status</button>
+    </div>
+
+    <p id="flash" role="status"></p>
+
+    <h2>Sync status</h2>
+    <dl id="status-dl">
+      <dt>Loading</dt>
+      <dd>Fetching /api/sync/status</dd>
+    </dl>
+
+    <h2>Last response</h2>
+    <pre id="output">No action yet.</pre>
+
+    <script>
+      const flash = document.getElementById('flash');
+      const output = document.getElementById('output');
+      const statusDl = document.getElementById('status-dl');
+      const syncBtn = document.getElementById('sync-btn');
+      const importBtn = document.getElementById('import-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+
+      function setBusy(busy) {
+        syncBtn.disabled = busy;
+        importBtn.disabled = busy;
+        refreshBtn.disabled = busy;
+      }
+
+      function showFlash(message, isError) {
+        flash.textContent = message;
+        flash.className = isError ? 'err' : 'ok';
+      }
+
+      function renderStatus(payload) {
+        const data = payload && payload.data ? payload.data : {};
+        const hierarchy = data.lastHierarchyRun || {};
+        const insights = data.lastInsightsRun || {};
+        statusDl.innerHTML = [
+          ['Data source', data.dataSource || '—'],
+          ['Last successful sync', data.lastSuccessfulSyncAt || '—'],
+          ['Synced through date', data.lastSyncedThroughDate || '—'],
+          ['Insight rows', String(data.insightRowCount ?? '—')],
+          ['Last hierarchy', (hierarchy.status || '—') + ' / ' + (hierarchy.rowsUpserted ?? '—') + ' rows'],
+          ['Last insights', (insights.status || '—') + ' / ' + (insights.rowsUpserted ?? '—') + ' rows'],
+          ['Insights window', (insights.windowStart || '—') + ' → ' + (insights.windowEnd || '—')],
+        ]
+          .map(function (pair) {
+            return '<dt>' + pair[0] + '</dt><dd>' + pair[1] + '</dd>';
+          })
+          .join('');
+      }
+
+      async function parseJson(response) {
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch (_error) {
+          return { success: false, error: text || 'Empty response' };
+        }
+      }
+
+      async function refreshStatus() {
+        const response = await fetch('/api/sync/status');
+        const body = await parseJson(response);
+        renderStatus(body);
+        return body;
+      }
+
+      async function post(path, label) {
+        setBusy(true);
+        showFlash(label + '…', false);
+        try {
+          const response = await fetch(path, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}',
+          });
+          const body = await parseJson(response);
+          output.textContent = JSON.stringify(body, null, 2);
+          if (!response.ok || body.success === false) {
+            showFlash(label + ' failed', true);
+          } else {
+            showFlash(label + ' complete', false);
+          }
+          await refreshStatus();
+        } catch (error) {
+          showFlash(label + ' failed', true);
+          output.textContent = String(error);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      syncBtn.addEventListener('click', function () {
+        post('/api/sync/run', 'Sync');
+      });
+      importBtn.addEventListener('click', function () {
+        post('/api/orders/import', 'Import');
+      });
+      refreshBtn.addEventListener('click', async function () {
+        setBusy(true);
+        try {
+          const body = await refreshStatus();
+          output.textContent = JSON.stringify(body, null, 2);
+          showFlash('Status refreshed', false);
+        } catch (error) {
+          showFlash('Status refresh failed', true);
+          output.textContent = String(error);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      refreshStatus().catch(function (error) {
+        showFlash('Could not load status', true);
+        output.textContent = String(error);
+      });
+    </script>
+  </body>
+</html>
