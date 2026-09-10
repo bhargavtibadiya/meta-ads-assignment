@@ -1,0 +1,18 @@
+# OS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Secrets and local env
+.env
+*.log
+
+# Build output
+dist/
+
+# Docs kept out of git
+docs/design-system/
+docs/plans/
+docs/runbook/
+docs/submission/
