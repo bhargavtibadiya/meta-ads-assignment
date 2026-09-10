@@ -1,0 +1,19 @@
+{
+  "meta_campaign_id": "23811111111111111",
+  "names": [
+    {
+      "name": "June Promo 2026",
+      "status": "ACTIVE",
+      "effective_status": "ACTIVE",
+      "valid_from": "2026-06-01T10:00:00+05:30",
+      "valid_to": "2026-08-27T23:59:59+05:30"
+    },
+    {
+      "name": "Summer Sale 2026",
+      "status": "ACTIVE",
+      "effective_status": "ACTIVE",
+      "valid_from": "2026-08-28T00:00:00+05:30",
+      "valid_to": null
+    }
+  ]
+}
