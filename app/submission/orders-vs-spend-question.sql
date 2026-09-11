@@ -4,8 +4,8 @@
 -- only. There is no row-level order-to-ad join (orders.csv has no click id).
 --
 -- Optional Metabase variables:
---   {{campaign}}     spend only (dropdown: current name + id). Orders stay
---                    account-level on purpose.
+--   {{campaign}}     spend-only dropdown of "Name (id)". Empty = all campaigns.
+--                    Orders stay account-level on purpose.
 --   {{start_date}}   inclusive start
 --   {{end_date}}     inclusive end
 --

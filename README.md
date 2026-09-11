@@ -8,9 +8,17 @@ Fixture-backed pipeline: daily ad-level Meta insights into PostgreSQL, `orders.c
 2. `docker compose up -d` — Postgres, Metabase (`:3000`), backend (`:4000`). Host Postgres is **5433** so a local 5432 can keep running.
 3. Sync: [http://localhost:4000](http://localhost:4000) → **Run sync**, or `curl -X POST http://localhost:4000/api/sync/run`.
 4. Orders: **Import orders**, or `curl -X POST http://localhost:4000/api/orders/import`.
-5. Chart: `cd app && npm run metabase:provision`, then [http://localhost:3000](http://localhost:3000) (`admin@example.com` / `MetaAdsAdmin1`).
-6. Question SQL: `app/submission/orders-vs-spend-question.sql`. Screenshot goes next to it as `app/submission/orders-vs-spend-chart.png`.
+5. Chart: `cd app && npm run metabase:provision`, then [http://localhost:3000](http://localhost:3000) (`admin@example.com` / `MetaAdsAdmin1`). Open **Orders vs Spend**.
+6. Question SQL: `app/submission/orders-vs-spend-question.sql`. Screenshot: `app/submission/orders-vs-spend-chart.png`.
 7. Five graded queries: `app/queries/*.sql`.
+
+## Campaign filter on the chart
+
+The filter is **Campaign**, not Meta's campaign id. Leave it empty for all campaigns. It changes **spend only**; order bars stay account-level.
+
+**Sync first**, then `cd app && npm run metabase:provision`, then hard-refresh the question. You should get a dropdown of labels like `Summer Sale 2026 (<uuid>)`. Pick one. Fixture names: **Summer Sale 2026**, **Evergreen Retargeting**, **Brand Awareness Q3**.
+
+If it still says **Campaign ID** as a text box, the saved question is the old version: re-run provision and refresh. Do not type Meta ids (`2381…`).
 
 ## Schema, and why
 
