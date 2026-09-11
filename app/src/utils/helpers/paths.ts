@@ -20,3 +20,13 @@ export function getAppRoot(): string {
 export function getFixturePath(fileName: string): string {
   return path.join(getAppRoot(), 'fixtures', fileName);
 }
+
+/**
+ * Resolves a path under `app/submission`.
+ *
+ * @param fileName - File name inside the submission directory
+ * @returns Absolute submission path
+ */
+export function getSubmissionPath(fileName: string): string {
+  return path.join(getAppRoot(), 'submission', fileName);
+}

@@ -10,5 +10,5 @@ export {
 } from './date.js';
 export { logger } from './logger.js';
 export { parseDto } from './parse-dto.js';
-export { getAppRoot, getFixturePath } from './paths.js';
+export { getAppRoot, getFixturePath, getSubmissionPath } from './paths.js';
 export { sendError, sendSuccess } from './response.js';
