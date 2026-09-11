@@ -1,0 +1,540 @@
+---
+description: Strict TypeScript standards for every .ts and .tsx file
+alwaysApply: true
+---
+
+# TypeScript Standards
+
+Universal TypeScript rules for every `.ts` and `.tsx` file in the codebase — frontend and backend. These rules are non-negotiable and apply regardless of framework, file type, or context.
+
+---
+
+## Absolute Rules — Never Break These
+
+### 1. No `any`
+
+`any` disables TypeScript's entire type system for that value. It is never acceptable.
+
+```ts
+// ❌ Never
+function process(data: any) { ... }
+const result: any = fetchData();
+let value: any;
+
+// ✅ Use the correct specific type
+function process(data: UserProfile[]) { ... }
+const result: ApiResponse<User> = fetchData();
+let value: string;
+
+// ✅ If the type is genuinely unknown at write-time, use a generic
+function process<T extends { id: string }>(items: T[]) {
+  return items.map(item => item.id);
+}
+```
+
+If you find yourself reaching for `any` because the type is "too hard" — that is a signal to define the right interface or generic, not to use `any`.
+
+---
+
+### 2. No `unknown` in normal code
+
+`unknown` is for the edges of the system: catching thrown errors, parsing external JSON, or wrapping third-party library values where types are genuinely not known. It is not a substitute for `any` in regular code.
+
+```ts
+// ❌ Not acceptable as a normal variable type
+let userId: unknown;
+function getUser(id: unknown): unknown { ... }
+
+// ✅ Legitimate use — error catch blocks
+catch (error: unknown) {
+  const message = error instanceof Error ? error.message : 'Unknown error';
+}
+
+// ✅ Legitimate use — parsing external/untrusted data at system boundary
+const rawData: unknown = JSON.parse(body);
+if (isUserProfile(rawData)) {
+  // now TypeScript knows rawData is UserProfile
+}
+```
+
+---
+
+### 3. No Type Casting (`as`)
+
+Type casting with `as` bypasses the type checker and lies to the compiler. It hides bugs instead of fixing them.
+
+```ts
+// ❌ Never
+const name = (user as any).name;
+const id = response.data as string;
+const element = document.getElementById('app') as HTMLDivElement;
+
+// ✅ Use type guards instead
+function isUser(value: unknown): value is User {
+  return typeof value === 'object' && value !== null && 'id' in value;
+}
+
+// ✅ For DOM elements, use the correct query method that returns a typed result
+const canvas = document.querySelector<HTMLCanvasElement>('#canvas');
+if (!canvas) throw new Error('Canvas not found');
+```
+
+The only permitted use of `as const` is for literal type narrowing on static data:
+
+```ts
+const DIRECTION = 'north' as const; // ✅ narrowing literal, not casting
+```
+
+---
+
+### 4. No Inline Types
+
+Never define a type inline on a variable declaration, object, or function parameter. All types belong in the `TYPE DEFINITIONS` section of the file or in a dedicated `.types.ts` file.
+
+```ts
+// ❌ Never — inline type on variable
+const user: { name: string; age: number } = { name: 'Alex', age: 30 };
+
+// ❌ Never — inline type in function parameter
+function createDog(dog: { name: string; breed: string; age: number }) { ... }
+
+// ❌ Never — inline type in function return
+function getConfig(): { timeout: number; retries: number } { ... }
+
+// ✅ Define the interface in the TYPE DEFINITIONS section
+interface UserProfile {
+  name: string;
+  age: number;
+}
+
+interface DogInput {
+  name: string;
+  breed: string;
+  age: number;
+}
+
+interface AppConfig {
+  timeout: number;
+  retries: number;
+}
+
+const user: UserProfile = { name: 'Alex', age: 30 };
+function createDog(dog: DogInput) { ... }
+function getConfig(): AppConfig { ... }
+```
+
+---
+
+### 5. No Boxed Primitive Types
+
+Never use `Number`, `String`, `Boolean`, `Object`, `Symbol` as types. These are JavaScript object wrappers, not primitives.
+
+```ts
+// ❌ Never
+const name: String = 'Alex';
+const count: Number = 5;
+const flag: Boolean = true;
+
+// ✅ Always lowercase primitives
+const name: string = 'Alex';
+const count: number = 5;
+const flag: boolean = true;
+```
+
+---
+
+## Type Declaration Rules
+
+### `interface` vs `type` — When to Use Each
+
+| Use `interface` when... | Use `type` when... |
+| ------------------------ | ------------------- |
+| Defining object shapes (entities, props, configs) | Defining union types |
+| The shape may be extended or implemented by a class | Defining tuple types |
+| Working with public APIs that others consume | Using utility types (`Partial<>`, `Pick<>`, `Omit<>`) |
+| Defining service contracts / class contracts | Defining function type signatures |
+| Better compiler error messages are needed | Creating intersection types |
+
+```ts
+// ✅ interface — object shape / entity
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+// ✅ interface — component props
+interface ButtonProps {
+  label: string;
+  variant?: 'primary' | 'secondary';
+  onClick: () => void;
+}
+
+// ✅ type — union
+type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+
+// ✅ type — utility type composition
+type PartialUserProfile = Partial<UserProfile>;
+type UserPreview = Pick<UserProfile, 'id' | 'name'>;
+type UserWithoutEmail = Omit<UserProfile, 'email'>;
+
+// ✅ type — discriminated union (always type, never interface)
+type ApiState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; message: string };
+```
+
+---
+
+### Type Declaration Location
+
+Types belong in the `TYPE DEFINITIONS` section of the file that uses them — unless the type is used across multiple files.
+
+**Decision order:**
+
+1. **Single file use** → declare in the `TYPE DEFINITIONS` section of that file
+2. **Multiple files in the same feature** → declare in `[feature].types.ts` in the same folder
+3. **Used across multiple features** → declare in `src/types/` (frontend) or `src/types/` (backend)
+4. **Used globally across frontend + backend** → declare in a shared types package
+
+```ts
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+// ✅ Declare all file-local types here, before the first function or component
+
+interface PaginationState {
+  page: number;
+  limit: number;
+  total: number;
+}
+
+type SortOrder = 'asc' | 'desc';
+
+interface ListingFilters {
+  search?: string;
+  category?: string;
+  sortOrder?: SortOrder;
+}
+```
+
+---
+
+### Naming Conventions
+
+| Item | Convention | Example |
+| ------ | ----------- | --------- |
+| Interface | PascalCase | `UserProfile`, `ButtonProps` |
+| Type alias | PascalCase | `LoadingState`, `SortOrder` |
+| Enum | PascalCase, values SCREAMING_SNAKE | `UserRole.BUSINESS_OWNER` |
+| Generic parameter | Single capital or descriptive | `T`, `TData`, `TError` |
+| Discriminated union discriminant | `status`, `type`, or `kind` | `{ status: 'loading' }` |
+
+For this codebase, store-related interfaces use the `I` prefix (e.g. `IGetMyDogThunkPayload`). This convention applies **only to store/thunk types** — do not use the `I` prefix for component props, entity interfaces, service types, or DTO types.
+
+---
+
+## Function Typing Rules
+
+### Always type function parameters and return values explicitly
+
+TypeScript can often infer return types, but explicit return types serve as a contract and catch mistakes early.
+
+```ts
+// ❌ Missing parameter types and return type
+function getUser(id) {
+  return prisma.user.findFirst({ where: { id } });
+}
+
+// ✅ Explicit parameters, explicit return type
+async function getUser(id: string): Promise<SafeUser | null> {
+  return prisma.user.findFirst({ where: { id } });
+}
+```
+
+### Use generics instead of `any` for flexible functions
+
+```ts
+// ❌ Losing type information
+function first(arr: any[]): any {
+  return arr[0];
+}
+
+// ✅ Generic preserves type safety
+function first<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+// ✅ Constrained generic — only accept objects with an id field
+function findById<T extends { id: string }>(items: T[], id: string): T | undefined {
+  return items.find(item => item.id === id);
+}
+```
+
+### Optional vs nullable parameters
+
+```ts
+// optional — parameter may be omitted by caller
+function search(query?: string): void { ... }
+
+// nullable — parameter must be passed but may be null
+function updateName(name: string | null): void { ... }
+
+// Both — parameter may be omitted or passed as null
+function setLabel(label?: string | null): void { ... }
+```
+
+---
+
+## Nullability Rules
+
+Always enable `strictNullChecks`. Never use non-null assertion (`!`) except in test files or when the value's presence has already been checked explicitly nearby.
+
+```ts
+// ❌ Unsafe — hides potential null
+const name = user!.name;
+
+// ✅ Safe — narrow before use
+if (!user) throw new Error('User is required');
+const name = user.name;
+
+// ✅ Safe — optional chaining
+const name = user?.name ?? 'Anonymous';
+```
+
+Use the nullish coalescing operator (`??`) instead of `||` when providing defaults for nullable values — `||` incorrectly treats `0`, `false`, and `''` as falsy:
+
+```ts
+// ❌ Incorrect — treats 0 and '' as nullish
+const page = filters.page || 1;  // breaks when page = 0
+
+// ✅ Correct — only replaces null and undefined
+const page = filters.page ?? 1;
+```
+
+---
+
+## Utility Types
+
+Use TypeScript's built-in utility types instead of duplicating or hand-writing partial copies of existing interfaces.
+
+| Utility | Purpose | Example |
+| --------- | --------- | --------- |
+| `Partial<T>` | All fields optional | Update DTOs |
+| `Required<T>` | All fields required | Ensuring fully populated objects |
+| `Readonly<T>` | All fields readonly | Immutable config, constants |
+| `Pick<T, K>` | Subset of fields | Response projections |
+| `Omit<T, K>` | All fields except K | Removing internal fields before sending |
+| `Record<K, V>` | Key-value map | Cache objects, lookup maps |
+| `ReturnType<T>` | Extract return type of a function | Inferring thunk return types |
+| `Parameters<T>` | Extract parameter types | Forwarding function arguments |
+
+```ts
+// ✅ Use Omit instead of rewriting an interface manually
+interface CreateListingPayload extends Omit<ApiListing, 'id' | 'createdAt' | 'updatedAt'> {
+  proofDocument: File;
+}
+
+// ✅ Use Record for cache/lookup maps
+const userCache: Record<string, UserProfile> = {};
+
+// ✅ Use Partial for update payloads
+type UpdateUserPayload = Partial<Omit<UserProfile, 'id'>>;
+```
+
+---
+
+## Enum Rules
+
+Use string enums — never numeric enums. String enums are readable in logs, API responses, and debuggers.
+
+```ts
+// ❌ Numeric enum — opaque and meaningless at runtime
+enum UserRole {
+  Admin,      // 0
+  User,       // 1
+}
+
+// ✅ String enum — self-documenting
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  BUSINESS_OWNER = 'BUSINESS_OWNER',
+  USER = 'USER',
+}
+
+// ✅ String literal union — use when enum is local to one file
+type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'UNVERIFIED';
+```
+
+Use `export enum` only once — in `utils/constants/enums.ts` (backend) or the equivalent constants file. Never redefine the same enum in multiple files.
+
+---
+
+## Type Guard Rules
+
+Use type guards when narrowing `unknown` values or discriminated unions. Never use `as` to skip the check.
+
+```ts
+// ✅ Type predicate guard
+function isApiError(value: unknown): value is ApiError {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'success' in value &&
+    'message' in value
+  );
+}
+
+// ✅ Discriminated union narrowing — exhaustive check
+function handleState(state: ApiState<User>) {
+  switch (state.status) {
+    case 'loading': return showSpinner();
+    case 'success': return renderUser(state.data);
+    case 'error': return showError(state.message);
+    case 'idle': return null;
+    default:
+      // TypeScript will error here if a case is unhandled
+      const _exhaustive: never = state;
+      return _exhaustive;
+  }
+}
+```
+
+---
+
+## `readonly` and Immutability
+
+Mark properties that should not be mutated after creation as `readonly`. This is especially important for entity IDs and config objects.
+
+```ts
+interface UserProfile {
+  readonly id: string;      // ✅ IDs should never change
+  name: string;             // mutable — can be updated
+  readonly createdAt: Date; // ✅ timestamps should never change
+}
+
+// ✅ Readonly array — prevents accidental mutation
+function processItems(items: readonly string[]): void { ... }
+```
+
+---
+
+## Async Request Guards
+
+Every React effect or thunk that fetches data must have an explicit duplicate-request guard. Never use only collection length, empty response data, or truthiness as the guard, because a successful empty response can retrigger the same request forever.
+
+Required pattern:
+
+- Store `loading` for in-flight protection.
+- Store an explicit request lifecycle flag such as `hasRequestedUsers`, `hasLoadedUsers`, or `lastFetchedAt`.
+- Check both flags before dispatching from `useEffect`.
+- Add a thunk `condition` when duplicate in-flight requests can be dispatched from multiple components.
+
+```ts
+// ❌ Infinite-loop risk when the API legitimately returns []
+useEffect(() => {
+  if (users.length > 0 || usersLoading) return;
+  dispatch(listUsersThunk());
+}, [dispatch, users.length, usersLoading]);
+
+// ✅ Empty success is still remembered as a completed request attempt
+useEffect(() => {
+  if (users.length > 0 || usersLoading || hasRequestedUsers) return;
+  dispatch(listUsersThunk());
+}, [dispatch, hasRequestedUsers, users.length, usersLoading]);
+```
+
+```ts
+// ✅ Thunk-level in-flight guard
+export const listUsersThunk = createAsyncThunk<
+  ListUsersResponse,
+  void,
+  ThunkConfig
+>(
+  'users/listUsers',
+  async (_, { rejectWithValue }) => {
+    // request implementation
+  },
+  {
+    condition: (_, { getState }) => !getState().users.listUsersLoading,
+  },
+);
+```
+
+---
+
+## tsconfig Requirements
+
+Every project must have these compiler options enabled:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+`strict: true` enables a group of checks. The additional flags above go beyond strict for further safety.
+
+---
+
+## Quick Reference — What to Do When Stuck
+
+| Situation | Solution |
+| ----------- | --------- |
+| Type is genuinely unknown (JSON parse, error catch) | Use `unknown` + type guard |
+| Need a flexible function that works on multiple types | Use generics `<T>` |
+| Need a partial version of an existing interface | Use `Partial<MyInterface>` |
+| Need to remove fields from an interface | Use `Omit<MyInterface, 'field'>` |
+| Need only specific fields | Use `Pick<MyInterface, 'field1' \| 'field2'>` |
+| Tempted to use `as` | Write a type guard function instead |
+| Tempted to use `any` | Define the correct interface or generic |
+| Type used in multiple files | Move to `[feature].types.ts` or `src/types/` |
+| Inline object type getting complex | Extract to a named interface in TYPE DEFINITIONS |
+
+---
+
+## Common Violations to Watch For
+
+```ts
+// ❌ 1. any in function parameter
+const handle = (e: any) => { ... }
+// ✅ const handle = (e: React.ChangeEvent<HTMLInputElement>) => { ... }
+
+// ❌ 2. Casting instead of typing
+const data = response as { users: User[] };
+// ✅ Define ApiResponse<T> interface and type the response properly
+
+// ❌ 3. Inline object type
+const config: { timeout: number; retries: number } = { timeout: 5000, retries: 3 };
+// ✅ interface AppConfig { timeout: number; retries: number }
+//    const config: AppConfig = { ... }
+
+// ❌ 4. Boxed primitive
+const name: String = 'hello';
+// ✅ const name: string = 'hello'
+
+// ❌ 5. Non-null assertion hiding a real null
+const user = getUser()!;
+// ✅ const user = getUser(); if (!user) throw new Error(...)
+
+// ❌ 6. || for default values on numbers
+const limit = filters.limit || 10;
+// ✅ const limit = filters.limit ?? 10
+
+// ❌ 7. Duplicating an interface instead of extending
+interface UpdateUserPayload { name?: string; email?: string; role?: string; }
+// ✅ type UpdateUserPayload = Partial<Omit<UserProfile, 'id' | 'createdAt'>>
+```

@@ -1,0 +1,250 @@
+// use prisma-next
+// [WHY] file is named schema.prisma (Prisma 7 habit). Prisma 8 still treats any
+// .prisma file named in prisma.config.ts as the data contract.
+
+// ============================================================================
+// ENUMS
+// Stored as PostgreSQL text plus a CHECK constraint (Prisma 8 enum codec).
+// ============================================================================
+
+enum MetaEntityStatus {
+  @@type("pg/text@1")
+  ACTIVE           = "ACTIVE"
+  PAUSED           = "PAUSED"
+  DELETED          = "DELETED"
+  ARCHIVED         = "ARCHIVED"
+  IN_PROCESS       = "IN_PROCESS"
+  WITH_ISSUES      = "WITH_ISSUES"
+  CAMPAIGN_PAUSED  = "CAMPAIGN_PAUSED"
+  ADSET_PAUSED     = "ADSET_PAUSED"
+  UNKNOWN          = "UNKNOWN"
+}
+
+enum SyncRunStatus {
+  @@type("pg/text@1")
+  RUNNING = "RUNNING"
+  SUCCESS = "SUCCESS"
+  FAILED  = "FAILED"
+}
+
+enum SyncEntityType {
+  @@type("pg/text@1")
+  HIERARCHY = "HIERARCHY"
+  INSIGHTS  = "INSIGHTS"
+}
+
+// ============================================================================
+// AD ACCOUNT
+// One row per Meta ad account we sync. Single-account use is expected for
+// this assignment, but the model does not hardcode that assumption.
+// ============================================================================
+
+model AdAccount {
+  id              String             @id @default(cuid(2)) @map("id")
+  metaAdAccountId String             @unique @map("meta_ad_account_id")
+  name            String             @map("name")
+  currency        String             @map("currency")
+  timezoneName    String             @map("timezone_name")
+  createdAt       TimestamptzString  @default(now()) @map("created_at")
+  updatedAt       temporal.updatedAtString() @map("updated_at")
+
+  campaigns       Campaign[]
+  syncCursor      SyncCursor[]
+
+  @@map("ad_accounts")
+}
+
+// ============================================================================
+// CAMPAIGN HIERARCHY
+// Stable entity row + SCD2 history. Insights always FK to the immutable
+// internal id, never to a name — a rename must not split historical spend.
+// ============================================================================
+
+model Campaign {
+  id              String             @id @default(cuid(2)) @map("id")
+  metaCampaignId  String             @unique @map("meta_campaign_id")
+  adAccountId     String             @map("ad_account_id")
+  adAccount       AdAccount          @relation(fields: [adAccountId], references: [id])
+  objective       String?            @map("objective")
+  currentName     String             @map("current_name")
+  currentStatus   MetaEntityStatus   @map("current_status")
+  metaCreatedTime TimestamptzString? @map("meta_created_time")
+  createdAt       TimestamptzString  @default(now()) @map("created_at")
+  updatedAt       temporal.updatedAtString() @map("updated_at")
+
+  adSets          AdSet[]
+  ads             Ad[]
+  insights        AdInsightDaily[]
+  versions        CampaignVersion[]
+
+  @@index([adAccountId])
+  @@map("campaigns")
+}
+
+model CampaignVersion {
+  id              String            @id @default(cuid(2)) @map("id")
+  campaignId      String            @map("campaign_id")
+  campaign        Campaign          @relation(fields: [campaignId], references: [id])
+  name            String            @map("name")
+  status          MetaEntityStatus  @map("status")
+  effectiveStatus MetaEntityStatus  @map("effective_status")
+  validFrom       TimestamptzString @map("valid_from")
+  validTo         TimestamptzString? @map("valid_to")
+
+  @@index([campaignId, validFrom])
+  @@map("campaign_versions")
+}
+
+model AdSet {
+  id               String             @id @default(cuid(2)) @map("id")
+  metaAdSetId      String             @unique @map("meta_ad_set_id")
+  campaignId       String             @map("campaign_id")
+  campaign         Campaign           @relation(fields: [campaignId], references: [id])
+  currentName      String             @map("current_name")
+  currentStatus    MetaEntityStatus   @map("current_status")
+  optimizationGoal String?            @map("optimization_goal")
+  billingEvent     String?            @map("billing_event")
+  dailyBudget      Numeric?           @map("daily_budget")
+  lifetimeBudget   Numeric?           @map("lifetime_budget")
+  metaCreatedTime  TimestamptzString? @map("meta_created_time")
+  createdAt        TimestamptzString  @default(now()) @map("created_at")
+  updatedAt        temporal.updatedAtString() @map("updated_at")
+
+  ads              Ad[]
+  insights         AdInsightDaily[]
+  versions         AdSetVersion[]
+
+  @@index([campaignId])
+  @@map("ad_sets")
+}
+
+model AdSetVersion {
+  id              String            @id @default(cuid(2)) @map("id")
+  adSetId         String            @map("ad_set_id")
+  adSet           AdSet             @relation(fields: [adSetId], references: [id])
+  name            String            @map("name")
+  status          MetaEntityStatus  @map("status")
+  effectiveStatus MetaEntityStatus  @map("effective_status")
+  validFrom       TimestamptzString @map("valid_from")
+  validTo         TimestamptzString? @map("valid_to")
+
+  @@index([adSetId, validFrom])
+  @@map("ad_set_versions")
+}
+
+model Ad {
+  id              String             @id @default(cuid(2)) @map("id")
+  metaAdId        String             @unique @map("meta_ad_id")
+  adSetId         String             @map("ad_set_id")
+  adSet           AdSet              @relation(fields: [adSetId], references: [id])
+  campaignId      String             @map("campaign_id")
+  campaign        Campaign           @relation(fields: [campaignId], references: [id])
+  currentName     String             @map("current_name")
+  currentStatus   MetaEntityStatus   @map("current_status")
+  creativeMetaId  String?            @map("creative_meta_id")
+  metaCreatedTime TimestamptzString? @map("meta_created_time")
+  createdAt       TimestamptzString  @default(now()) @map("created_at")
+  updatedAt       temporal.updatedAtString() @map("updated_at")
+
+  insights        AdInsightDaily[]
+  versions        AdVersion[]
+
+  @@index([adSetId])
+  @@index([campaignId])
+  @@map("ads")
+}
+
+model AdVersion {
+  id              String            @id @default(cuid(2)) @map("id")
+  adId            String            @map("ad_id")
+  ad              Ad                @relation(fields: [adId], references: [id])
+  name            String            @map("name")
+  status          MetaEntityStatus  @map("status")
+  effectiveStatus MetaEntityStatus  @map("effective_status")
+  validFrom       TimestamptzString @map("valid_from")
+  validTo         TimestamptzString? @map("valid_to")
+
+  @@index([adId, validFrom])
+  @@map("ad_versions")
+}
+
+// ============================================================================
+// INSIGHTS FACT TABLE
+// One row per ad per day. This is the table every required .sql query reads.
+// ============================================================================
+
+model AdInsightDaily {
+  id                 String            @id @default(cuid(2)) @map("id")
+  adId               String            @map("ad_id")
+  ad                 Ad                @relation(fields: [adId], references: [id])
+  campaignId         String            @map("campaign_id")
+  campaign           Campaign          @relation(fields: [campaignId], references: [id])
+  adSetId            String            @map("ad_set_id")
+  adSet              AdSet             @relation(fields: [adSetId], references: [id])
+  date               DateString        @map("date")
+  impressions        Int               @default(0) @map("impressions")
+  clicks             Int               @default(0) @map("clicks")
+  spend              Numeric           @default("0") @map("spend")
+  purchases          Int               @default(0) @map("purchases")
+  purchaseValue      Numeric           @default("0") @map("purchase_value")
+  attributionWindows String            @map("attribution_windows")
+  rawActionsJson     Jsonb?            @map("raw_actions_json")
+  syncedAt           TimestamptzString @default(now()) @map("synced_at")
+  createdAt          TimestamptzString @default(now()) @map("created_at")
+  updatedAt          temporal.updatedAtString() @map("updated_at")
+
+  @@unique([adId, date])
+  @@index([campaignId, date])
+  @@index([date])
+  @@map("ad_insight_daily")
+}
+
+// ============================================================================
+// SYNC BOOKKEEPING
+// ============================================================================
+
+model SyncCursor {
+  id                    String             @id @default(cuid(2)) @map("id")
+  adAccountId           String             @unique @map("ad_account_id")
+  adAccount             AdAccount          @relation(fields: [adAccountId], references: [id])
+  lastSuccessfulSyncAt  TimestamptzString? @map("last_successful_sync_at")
+  lastSyncedThroughDate DateString         @map("last_synced_through_date")
+  updatedAt             temporal.updatedAtString() @map("updated_at")
+
+  @@map("sync_cursors")
+}
+
+model SyncRun {
+  id           String            @id @default(cuid(2)) @map("id")
+  entityType   SyncEntityType    @map("entity_type")
+  status       SyncRunStatus     @default(RUNNING) @map("status")
+  windowStart  DateString?       @map("window_start")
+  windowEnd    DateString?       @map("window_end")
+  rowsUpserted Int               @default(0) @map("rows_upserted")
+  errorMessage String?           @map("error_message")
+  startedAt    TimestamptzString @default(now()) @map("started_at")
+  finishedAt   TimestamptzString? @map("finished_at")
+
+  @@index([entityType, startedAt])
+  @@map("sync_runs")
+}
+
+// ============================================================================
+// ORDERS
+// Imported as-is from fixtures/orders.csv. Join to Meta data is on the date
+// axis only — see docs/db/schema-fields.md.
+// ============================================================================
+
+model Order {
+  id              String            @id @default(cuid(2)) @map("id")
+  externalOrderId String            @unique @map("external_order_id")
+  orderedAt       TimestamptzString @map("ordered_at")
+  totalAmount     Numeric           @map("total_amount")
+  currency        String?           @map("currency")
+  utmCampaign     String?           @map("utm_campaign")
+  rawRowJson      Jsonb             @map("raw_row_json")
+  importedAt      TimestamptzString @default(now()) @map("imported_at")
+
+  @@index([orderedAt])
+  @@map("orders")
+}

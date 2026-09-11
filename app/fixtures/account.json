@@ -1,0 +1,8 @@
+{
+  "id": "act_100000000000001",
+  "name": "D2C Demo Ad Account",
+  "account_id": "100000000000001",
+  "currency": "INR",
+  "timezone_name": "Asia/Kolkata",
+  "timezone_offset_hours_utc": 5.5
+}

@@ -1,0 +1,1642 @@
+{
+  "data": [
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-20",
+      "date_stop": "2026-08-20",
+      "impressions": "11600",
+      "clicks": "160",
+      "spend": "2240.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-20",
+      "date_stop": "2026-08-20",
+      "impressions": "9600",
+      "clicks": "160",
+      "spend": "1740.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-20",
+      "date_stop": "2026-08-20",
+      "impressions": "9600",
+      "clicks": "160",
+      "spend": "1080.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-20",
+      "date_stop": "2026-08-20",
+      "impressions": "20200",
+      "clicks": "110",
+      "spend": "380.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-21",
+      "date_stop": "2026-08-21",
+      "impressions": "11680",
+      "clicks": "162",
+      "spend": "2247.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-21",
+      "date_stop": "2026-08-21",
+      "impressions": "9680",
+      "clicks": "162",
+      "spend": "1747.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-21",
+      "date_stop": "2026-08-21",
+      "impressions": "9680",
+      "clicks": "162",
+      "spend": "1087.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-21",
+      "date_stop": "2026-08-21",
+      "impressions": "20310",
+      "clicks": "111",
+      "spend": "392.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-22",
+      "date_stop": "2026-08-22",
+      "impressions": "11760",
+      "clicks": "164",
+      "spend": "2254.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-22",
+      "date_stop": "2026-08-22",
+      "impressions": "9760",
+      "clicks": "164",
+      "spend": "1754.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-22",
+      "date_stop": "2026-08-22",
+      "impressions": "9760",
+      "clicks": "164",
+      "spend": "1094.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-22",
+      "date_stop": "2026-08-22",
+      "impressions": "20420",
+      "clicks": "112",
+      "spend": "404.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-23",
+      "date_stop": "2026-08-23",
+      "impressions": "11840",
+      "clicks": "166",
+      "spend": "2261.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-23",
+      "date_stop": "2026-08-23",
+      "impressions": "9840",
+      "clicks": "166",
+      "spend": "1761.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-23",
+      "date_stop": "2026-08-23",
+      "impressions": "9840",
+      "clicks": "166",
+      "spend": "1101.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-23",
+      "date_stop": "2026-08-23",
+      "impressions": "20530",
+      "clicks": "113",
+      "spend": "416.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-24",
+      "date_stop": "2026-08-24",
+      "impressions": "11920",
+      "clicks": "168",
+      "spend": "2268.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-24",
+      "date_stop": "2026-08-24",
+      "impressions": "9920",
+      "clicks": "168",
+      "spend": "1768.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-24",
+      "date_stop": "2026-08-24",
+      "impressions": "9920",
+      "clicks": "168",
+      "spend": "1108.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-24",
+      "date_stop": "2026-08-24",
+      "impressions": "20640",
+      "clicks": "114",
+      "spend": "428.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-25",
+      "date_stop": "2026-08-25",
+      "impressions": "12000",
+      "clicks": "170",
+      "spend": "2275.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-25",
+      "date_stop": "2026-08-25",
+      "impressions": "10000",
+      "clicks": "170",
+      "spend": "1775.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-25",
+      "date_stop": "2026-08-25",
+      "impressions": "10000",
+      "clicks": "170",
+      "spend": "1115.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-25",
+      "date_stop": "2026-08-25",
+      "impressions": "20750",
+      "clicks": "115",
+      "spend": "380.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-26",
+      "date_stop": "2026-08-26",
+      "impressions": "12080",
+      "clicks": "172",
+      "spend": "2282.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-26",
+      "date_stop": "2026-08-26",
+      "impressions": "10080",
+      "clicks": "172",
+      "spend": "1782.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-26",
+      "date_stop": "2026-08-26",
+      "impressions": "10080",
+      "clicks": "172",
+      "spend": "1122.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-26",
+      "date_stop": "2026-08-26",
+      "impressions": "20860",
+      "clicks": "116",
+      "spend": "392.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-27",
+      "date_stop": "2026-08-27",
+      "impressions": "12160",
+      "clicks": "174",
+      "spend": "2289.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-27",
+      "date_stop": "2026-08-27",
+      "impressions": "10160",
+      "clicks": "174",
+      "spend": "1789.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-27",
+      "date_stop": "2026-08-27",
+      "impressions": "10160",
+      "clicks": "174",
+      "spend": "1129.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-27",
+      "date_stop": "2026-08-27",
+      "impressions": "20970",
+      "clicks": "117",
+      "spend": "404.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-28",
+      "date_stop": "2026-08-28",
+      "impressions": "12240",
+      "clicks": "176",
+      "spend": "2296.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-28",
+      "date_stop": "2026-08-28",
+      "impressions": "10240",
+      "clicks": "176",
+      "spend": "1796.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-28",
+      "date_stop": "2026-08-28",
+      "impressions": "10240",
+      "clicks": "176",
+      "spend": "1136.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-28",
+      "date_stop": "2026-08-28",
+      "impressions": "21080",
+      "clicks": "118",
+      "spend": "416.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-29",
+      "date_stop": "2026-08-29",
+      "impressions": "12320",
+      "clicks": "178",
+      "spend": "2303.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-29",
+      "date_stop": "2026-08-29",
+      "impressions": "10320",
+      "clicks": "178",
+      "spend": "1803.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-29",
+      "date_stop": "2026-08-29",
+      "impressions": "10320",
+      "clicks": "178",
+      "spend": "1143.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-29",
+      "date_stop": "2026-08-29",
+      "impressions": "21190",
+      "clicks": "119",
+      "spend": "428.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-30",
+      "date_stop": "2026-08-30",
+      "impressions": "12400",
+      "clicks": "180",
+      "spend": "2310.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-30",
+      "date_stop": "2026-08-30",
+      "impressions": "10400",
+      "clicks": "180",
+      "spend": "1810.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-30",
+      "date_stop": "2026-08-30",
+      "impressions": "10400",
+      "clicks": "180",
+      "spend": "1150.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-30",
+      "date_stop": "2026-08-30",
+      "impressions": "21300",
+      "clicks": "120",
+      "spend": "380.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-31",
+      "date_stop": "2026-08-31",
+      "impressions": "12480",
+      "clicks": "182",
+      "spend": "2317.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-08-31",
+      "date_stop": "2026-08-31",
+      "impressions": "10480",
+      "clicks": "182",
+      "spend": "1817.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-08-31",
+      "date_stop": "2026-08-31",
+      "impressions": "10480",
+      "clicks": "182",
+      "spend": "1157.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-08-31",
+      "date_stop": "2026-08-31",
+      "impressions": "21410",
+      "clicks": "121",
+      "spend": "392.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-01",
+      "date_stop": "2026-09-01",
+      "impressions": "10080",
+      "clicks": "122",
+      "spend": "2107.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-01",
+      "date_stop": "2026-09-01",
+      "impressions": "8080",
+      "clicks": "122",
+      "spend": "1607.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-01",
+      "date_stop": "2026-09-01",
+      "impressions": "8080",
+      "clicks": "122",
+      "spend": "947.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-01",
+      "date_stop": "2026-09-01",
+      "impressions": "18110",
+      "clicks": "91",
+      "spend": "392.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-02",
+      "date_stop": "2026-09-02",
+      "impressions": "10160",
+      "clicks": "124",
+      "spend": "2114.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-02",
+      "date_stop": "2026-09-02",
+      "impressions": "8160",
+      "clicks": "124",
+      "spend": "1614.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-02",
+      "date_stop": "2026-09-02",
+      "impressions": "8160",
+      "clicks": "124",
+      "spend": "954.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-02",
+      "date_stop": "2026-09-02",
+      "impressions": "18220",
+      "clicks": "92",
+      "spend": "404.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-03",
+      "date_stop": "2026-09-03",
+      "impressions": "10240",
+      "clicks": "126",
+      "spend": "2121.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-03",
+      "date_stop": "2026-09-03",
+      "impressions": "8240",
+      "clicks": "126",
+      "spend": "1621.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-03",
+      "date_stop": "2026-09-03",
+      "impressions": "8240",
+      "clicks": "126",
+      "spend": "961.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-03",
+      "date_stop": "2026-09-03",
+      "impressions": "18330",
+      "clicks": "93",
+      "spend": "416.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-04",
+      "date_stop": "2026-09-04",
+      "impressions": "10320",
+      "clicks": "128",
+      "spend": "2128.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-04",
+      "date_stop": "2026-09-04",
+      "impressions": "8320",
+      "clicks": "128",
+      "spend": "1628.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-04",
+      "date_stop": "2026-09-04",
+      "impressions": "8320",
+      "clicks": "128",
+      "spend": "968.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-04",
+      "date_stop": "2026-09-04",
+      "impressions": "18440",
+      "clicks": "94",
+      "spend": "428.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-05",
+      "date_stop": "2026-09-05",
+      "impressions": "10400",
+      "clicks": "130",
+      "spend": "2135.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-05",
+      "date_stop": "2026-09-05",
+      "impressions": "8400",
+      "clicks": "130",
+      "spend": "1635.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-05",
+      "date_stop": "2026-09-05",
+      "impressions": "8400",
+      "clicks": "130",
+      "spend": "975.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-05",
+      "date_stop": "2026-09-05",
+      "impressions": "18550",
+      "clicks": "95",
+      "spend": "380.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-06",
+      "date_stop": "2026-09-06",
+      "impressions": "10480",
+      "clicks": "132",
+      "spend": "2142.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-06",
+      "date_stop": "2026-09-06",
+      "impressions": "8480",
+      "clicks": "132",
+      "spend": "1642.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "8800.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-06",
+      "date_stop": "2026-09-06",
+      "impressions": "8480",
+      "clicks": "132",
+      "spend": "982.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-06",
+      "date_stop": "2026-09-06",
+      "impressions": "18660",
+      "clicks": "96",
+      "spend": "392.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-07",
+      "date_stop": "2026-09-07",
+      "impressions": "10560",
+      "clicks": "134",
+      "spend": "2149.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-07",
+      "date_stop": "2026-09-07",
+      "impressions": "8560",
+      "clicks": "134",
+      "spend": "1649.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11000.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-07",
+      "date_stop": "2026-09-07",
+      "impressions": "8560",
+      "clicks": "134",
+      "spend": "989.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "5"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "9250.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-07",
+      "date_stop": "2026-09-07",
+      "impressions": "18770",
+      "clicks": "97",
+      "spend": "404.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-08",
+      "date_stop": "2026-09-08",
+      "impressions": "10640",
+      "clicks": "136",
+      "spend": "2156.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-08",
+      "date_stop": "2026-09-08",
+      "impressions": "8640",
+      "clicks": "136",
+      "spend": "1656.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "2"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-08",
+      "date_stop": "2026-09-08",
+      "impressions": "8640",
+      "clicks": "136",
+      "spend": "996.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "11100.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-08",
+      "date_stop": "2026-09-08",
+      "impressions": "18880",
+      "clicks": "98",
+      "spend": "416.00",
+      "actions": [],
+      "action_values": []
+    },
+    {
+      "ad_id": "23851111111111111",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-09",
+      "date_stop": "2026-09-09",
+      "impressions": "10720",
+      "clicks": "138",
+      "spend": "2163.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23851111111111112",
+      "adset_id": "23841111111111111",
+      "campaign_id": "23811111111111111",
+      "date_start": "2026-09-09",
+      "date_stop": "2026-09-09",
+      "impressions": "8720",
+      "clicks": "138",
+      "spend": "1663.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "3"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "6600.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23852222222222221",
+      "adset_id": "23842222222222222",
+      "campaign_id": "23822222222222222",
+      "date_start": "2026-09-09",
+      "date_stop": "2026-09-09",
+      "impressions": "8720",
+      "clicks": "138",
+      "spend": "1003.00",
+      "actions": [
+        {
+          "action_type": "omni_purchase",
+          "value": "4"
+        }
+      ],
+      "action_values": [
+        {
+          "action_type": "omni_purchase",
+          "value": "7400.00"
+        }
+      ]
+    },
+    {
+      "ad_id": "23853333333333331",
+      "adset_id": "23843333333333333",
+      "campaign_id": "23833333333333333",
+      "date_start": "2026-09-09",
+      "date_stop": "2026-09-09",
+      "impressions": "18990",
+      "clicks": "99",
+      "spend": "428.00",
+      "actions": [],
+      "action_values": []
+    }
+  ]
+}

@@ -1,0 +1,392 @@
+---
+description: Canonical backend folder structure — follow when creating, moving, or placing new files
+globs: "**/*.{ts,tsx,js,jsx,css,md}"
+alwaysApply: false
+---
+
+# Backend Folder Structure
+
+Standardized folder structure for a **Node.js + Express + Prisma + TypeScript** backend. Use this as the single source of truth when creating, moving, or reviewing any backend file.
+
+> Tech stack: Express, Prisma ORM, BullMQ (queues), Redis, Cloudinary, Swagger. Adapt service names but keep the structural pattern identical.
+
+---
+
+## Canonical Structure
+
+```
+src/
+├── config/                         # Third-party and infrastructure configs
+│   ├── prisma.ts                   # Prisma client singleton
+│   ├── multer.ts                   # File upload config
+│   └── [service].ts                # Any other service config (e.g. cloudinary.ts)
+│
+├── middleware/                     # Express middleware only
+│   ├── auth.ts                     # JWT / session auth guard
+│   ├── errorHandler.ts             # Global error handler
+│   ├── validateDto.ts              # DTO validation middleware
+│   └── [name].ts                   # Any additional middleware
+│
+├── modules/                        # All feature modules live here
+│   ├── auth/
+│   │   ├── dto/
+│   │   │   └── auth.dto.ts
+│   │   ├── types/
+│   │   │   └── auth.types.ts
+│   │   ├── auth.controller.ts
+│   │   ├── auth.routes.ts
+│   │   └── auth.service.ts
+│   ├── admin/
+│   │   ├── dto/
+│   │   │   └── admin.dto.ts
+│   │   ├── admin.controller.ts
+│   │   ├── admin.routes.ts
+│   │   └── admin.service.ts
+│   ├── mail/                       # Internal-only module (no routes/controller)
+│   │   ├── templates/
+│   │   │   ├── welcome-email.ts
+│   │   │   ├── claim-rejection.ts
+│   │   │   └── index.ts
+│   │   ├── types/
+│   │   │   └── mail.types.ts
+│   │   ├── mail.service.ts
+│   │   └── index.ts
+│   └── [feature]/                  # Every new feature follows the same pattern
+│       ├── dto/
+│       │   └── [feature].dto.ts
+│       ├── types/                  # Only if module has complex local types
+│       │   └── [feature].types.ts
+│       ├── [feature].controller.ts
+│       ├── [feature].routes.ts
+│       └── [feature].service.ts
+│
+├── services/                       # Shared infrastructure & external services
+│   ├── cloudinary/
+│   │   ├── cloudinary.service.ts
+│   │   └── index.ts
+│   ├── redis/
+│   │   ├── redis.config.ts
+│   │   ├── redis.connection.ts
+│   │   ├── redis.types.ts
+│   │   └── index.ts
+│   ├── cron/
+│   │   ├── config/
+│   │   │   ├── schedules.config.ts
+│   │   │   └── index.ts
+│   │   ├── schedulers/
+│   │   │   ├── cron.scheduler.ts
+│   │   │   └── index.ts
+│   │   ├── types/
+│   │   │   ├── cron.types.ts
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── queue/
+│   │   └── bull/
+│   │       ├── jobs/
+│   │       │   └── [name].jobs.ts
+│   │       ├── processors/
+│   │       │   └── [name].processor.ts
+│   │       ├── queues/
+│   │       │   └── [name].queue.ts
+│   │       ├── workers/
+│   │       │   ├── [name].worker.ts
+│   │       │   └── index.ts
+│   │       ├── types/
+│   │       │   └── [name].types.ts
+│   │       ├── register.ts
+│   │       └── index.ts
+│   ├── pagination/
+│   │   └── index.ts
+│   ├── rate-limit/
+│   │   └── index.ts
+│   └── swagger/
+│       ├── base/
+│       │   ├── info.ts
+│       │   ├── security.ts
+│       │   ├── servers.ts
+│       │   └── tags.ts
+│       ├── components/
+│       │   ├── parameters/
+│       │   ├── requestBodies/
+│       │   ├── responses/
+│       │   ├── schemas/
+│       │   └── index.ts
+│       ├── modules/
+│       │   └── [feature]/
+│       │       └── paths.ts        # One paths.ts per module
+│       └── index.ts
+│
+├── resources/                      # Static assets bundled with the app
+│   └── images/
+│       └── logo.png
+│
+├── scripts/
+│   └── seed.ts                     # Entry point only — delegates to utils/seed/
+│
+├── types/                          # Global TypeScript declaration files
+│   ├── express.d.ts                # Extend Express Request/Response types
+│   └── [lib].d.ts                  # Declarations for libs missing types
+│
+├── utils/                          # Pure utilities — NO loose files at root
+│   ├── constants/                  # App-wide constant values
+│   │   ├── enums.ts
+│   │   ├── routes.ts
+│   │   ├── pagination.ts
+│   │   ├── rateLimit.ts
+│   │   ├── notifications.ts
+│   │   ├── cron.ts
+│   │   └── storage.ts
+│   ├── helpers/                    # Pure utility functions
+│   │   ├── response.ts             # Standardized API response builder
+│   │   ├── logger.ts               # Logger setup
+│   │   ├── date.ts                 # Date formatting/parsing helpers
+│   │   ├── cookie.ts               # Cookie helpers
+│   │   ├── badgeUtils.ts           # Badge logic helpers
+│   │   ├── csvGenerator.ts         # CSV export helper
+│   │   ├── recaptcha.ts            # reCAPTCHA verification
+│   │   └── index.ts                # Re-exports all helpers
+│   └── seed/                       # Seed data files (not scripts)
+│       ├── dev/                    # Development seed data
+│       │   ├── users/
+│       │   │   └── users.seed.ts
+│       │   ├── listings/
+│       │   │   └── listings.seed.ts
+│       │   ├── dogs/
+│       │   │   └── dogs.seed.ts
+│       │   └── clear.seed.ts
+│       └── master/                 # Master / production seed data
+│           ├── categories/
+│           │   └── categories.seed.ts
+│           ├── facilities/
+│           │   └── facilities.seed.ts
+│           ├── plans/
+│           │   └── plans.seed.ts
+│           └── clear.seed.ts
+│
+└── server.ts                       # App entry point
+```
+
+---
+
+## Root-Level Files
+
+```
+prisma/
+├── schema.prisma                   # Managed by Prisma — do not restructure
+└── migrations/                     # Auto-generated by Prisma — do not edit manually
+
+.cursor/rules/                      # Agentic IDE rules (Cursor, Windsurf, etc.)
+docs/                               # Project documentation
+.env.example
+tsconfig.json
+package.json
+```
+
+**Agentic IDE / CLI rules** (`.cursor/rules/`, `.github/copilot-instructions.md`, etc.) are managed per-tool. Each AI editor stores its rules differently — create the appropriate rules file for whichever tool you use. The file content follows the same principle: one rule file per concern (e.g. `coding-guidelines`, `listing-workflow`).
+
+**Prisma** manages its own folder. Never manually create or edit files inside `prisma/migrations/`. Run `npx prisma migrate dev` to generate migrations.
+
+**`docs/`** should mirror the backend's own domain structure:
+
+```
+docs/
+├── brand/          ← brand guidelines, email templates
+├── db/             ← schema documentation, ERD notes
+├── development/    ← module-specific dev guides
+└── rbac/           ← role-based access control policies
+```
+
+---
+
+## Module Rules
+
+Every API-facing feature lives in `src/modules/[feature]/` with this structure:
+
+| File | Responsibility |
+| ------ | --------------- |
+| `[feature].routes.ts` | Route definitions + middleware assignment |
+| `[feature].controller.ts` | Request/response handling — no business logic |
+| `[feature].service.ts` | All business logic, DB calls via Prisma |
+| `dto/[feature].dto.ts` | Input validation schemas (class-validator / zod) |
+| `types/[feature].types.ts` | Local TypeScript types (only if needed) |
+
+**Internal-only modules** (no HTTP routes) omit `controller` and `routes`. Example: `mail` module has only `mail.service.ts`, `templates/`, `types/`, and `index.ts`. The service is imported directly by other modules.
+
+**Optional sub-folders** inside a module (add only when needed):
+
+```
+modules/[feature]/
+├── dto/
+├── types/
+├── templates/          ← e.g. mail module: email HTML/text templates
+├── helpers/            ← feature-specific helper functions
+└── [feature].test.ts   ← unit tests co-located with module
+```
+
+**Naming convention:** all module folders and files are **kebab-case**.
+
+- Folder: `lost-found/`, `check-ins/`, `saved-spots/`
+- Files: `lost-found.controller.ts`, `lost-found.service.ts`
+
+---
+
+## Config Rules
+
+`src/config/` holds only initialization/configuration of external tools and connections.
+
+| File | What goes here |
+| ------ | --------------- |
+| `prisma.ts` | Prisma client singleton export |
+| `multer.ts` | Multer storage engine + file filter |
+| `[service].ts` | Any third-party SDK init (Stripe, SendGrid, etc.) |
+
+**Rules:**
+
+- No business logic in config files — only setup and export
+- Each config file exports exactly one configured instance
+- Import config files only from `services/` or `modules/` — never from `utils/`
+
+---
+
+## Services Rules
+
+`src/services/` holds shared infrastructure that is not a feature module. Each service lives in its own named folder and defines its own internal structure based on its complexity.
+
+| Service | When to create it |
+| --------- | ------------------ |
+| `cloudinary/` | File/image storage |
+| `redis/` | Caching, pub/sub, rate-limit backing |
+| `cron/` | Scheduled jobs |
+| `queue/bull/` | Background job processing with BullMQ |
+| `pagination/` | Reusable pagination utility |
+| `rate-limit/` | Express rate limiter setup |
+| `swagger/` | API documentation generation |
+
+**There is no single required internal structure** for services — each folder is organized by its own domain needs. The only rule is: every service folder must have an `index.ts` that exports its public API. Internal files are not imported directly from outside the service folder.
+
+**Queue structure (BullMQ pattern):**
+
+```
+queue/bull/
+├── jobs/           ← job payload definitions and creators
+├── processors/     ← job processing logic
+├── queues/         ← queue instantiation
+├── workers/        ← worker setup
+├── types/          ← queue-specific types
+├── register.ts     ← registers all workers/processors on startup
+└── index.ts        ← public exports
+```
+
+**Swagger structure:**
+
+```
+swagger/
+├── base/           ← OpenAPI document metadata (info, servers, security, tags)
+├── components/     ← Reusable schemas, responses, parameters, requestBodies
+├── modules/        ← One folder per feature module, each with paths.ts
+└── index.ts        ← Assembles and exports the full OpenAPI document
+```
+
+Add a new `swagger/modules/[feature]/paths.ts` every time a new module is created.
+
+---
+
+## Utils Rules
+
+**Hard rule: no loose files directly inside `utils/`. Every file must be inside a subfolder.**
+
+| Subfolder | What belongs there |
+| ----------- | ------------------- |
+| `utils/constants/` | App-wide constant values, enums, route strings, limits |
+| `utils/helpers/` | Pure stateless functions — formatting, parsing, building responses |
+| `utils/seed/` | Seed data organized by environment (`dev/`, `master/`) |
+
+**Constants vs Helpers:**
+
+- `constants/` = values that never change at runtime (enums, string maps, number limits)
+- `helpers/` = functions that transform or compute something (response builder, date formatter)
+- If a helper grows beyond one concern, extract it to its own subfolder: `utils/geo/`, `utils/media/`, etc.
+
+**Seed architecture:**
+
+- `src/scripts/seed.ts` is the **entry point only** — it imports and runs seed functions
+- All seed data and logic lives in `utils/seed/dev/` or `utils/seed/master/`
+- `dev/` seeds are for local development (fake users, listings, dogs)
+- `master/` seeds are for production master data (categories, plans, facilities)
+- Each entity gets its own folder: `utils/seed/dev/users/users.seed.ts`
+- `clear.seed.ts` lives at the root of each environment folder to handle teardown
+
+---
+
+## Types Rules
+
+`src/types/` contains only TypeScript **declaration files** (`.d.ts`).
+
+- `express.d.ts` — extends `Express.Request` with custom properties (e.g. `req.user`)
+- `[lib].d.ts` — type declarations for third-party libs that ship without types
+
+**Do not put runtime code here.** Module-specific types belong in `modules/[feature]/types/`. Shared runtime types belong in `utils/constants/enums.ts` or the relevant module.
+
+---
+
+## Adding a New Feature — Checklist
+
+```
+1. Create src/modules/[feature]/
+   □ dto/[feature].dto.ts          — input validation
+   □ [feature].controller.ts       — req/res only, calls service
+   □ [feature].routes.ts           — routes + middleware
+   □ [feature].service.ts          — business logic + Prisma calls
+   □ types/[feature].types.ts      — only if local types are needed
+
+2. Register routes
+   □ Import routes in server.ts (or central router file)
+   □ Mount at correct path: app.use("/api/[feature]", featureRoutes)
+
+3. Add Swagger docs
+   □ Create src/services/swagger/modules/[feature]/paths.ts
+   □ Import paths in src/services/swagger/index.ts
+
+4. Add any constants
+   □ Route strings → utils/constants/routes.ts
+   □ Enums → utils/constants/enums.ts
+
+5. If feature needs background jobs
+   □ Add queue: services/queue/bull/queues/[feature].queue.ts
+   □ Add job: services/queue/bull/jobs/[feature].jobs.ts
+   □ Add processor: services/queue/bull/processors/[feature].processor.ts
+   □ Add worker: services/queue/bull/workers/[feature].worker.ts
+   □ Register worker in services/queue/bull/register.ts
+```
+
+---
+
+## Naming Conventions
+
+| Item | Convention | Example |
+| ------ | ----------- | --------- |
+| Module folders | kebab-case | `lost-found/`, `check-ins/` |
+| Module files | `[feature].[type].ts` | `auth.controller.ts` |
+| DTO files | `[feature].dto.ts` | `admin.dto.ts` |
+| Type files | `[feature].types.ts` | `mail.types.ts` |
+| Service files | `[name].service.ts` | `cloudinary.service.ts` |
+| Constant files | descriptive noun | `enums.ts`, `routes.ts` |
+| Helper files | descriptive noun | `response.ts`, `date.ts` |
+| Seed files | `[entity].seed.ts` | `users.seed.ts` |
+
+---
+
+## What Does NOT Belong in Each Folder
+
+| Folder | Do NOT put here |
+| -------- | ---------------- |
+| `config/` | Business logic, route handlers |
+| `middleware/` | Business logic — only request/response pipeline logic |
+| `modules/` | Loose files — every feature must be in its own subfolder |
+| `modules/[feature]/` | Database schema changes — those are Prisma migrations |
+| `services/` | Feature-specific business logic — that goes in modules |
+| `utils/constants/` | Functions — those go in `helpers/` |
+| `utils/helpers/` | Constant values — those go in `constants/` |
+| `utils/seed/` | Live application logic — seed files are data only |
+| `types/` | Runtime code — declaration files only |
+| `scripts/` | Seed data — entry point only, data lives in `utils/seed/` |

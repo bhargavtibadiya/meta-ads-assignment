@@ -1,0 +1,46 @@
+{
+  "name": "meta-ads-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Meta Ads to PostgreSQL sync pipeline for the take-home assignment",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "prisma:emit": "prisma contract emit",
+    "prisma:dev-push": "prisma contract emit && prisma db update",
+    "prisma:plan": "prisma contract emit && prisma migration plan --name init",
+    "prisma:migrate": "prisma db migrate --yes",
+    "prisma:init-db": "prisma contract emit && prisma db init",
+    "prisma:generate": "prisma contract emit",
+    "prisma:studio": "prisma studio",
+    "sync:run": "tsx src/scripts/run-sync.ts",
+    "import:orders": "tsx src/scripts/import-orders.ts",
+    "metabase:provision": "tsx src/scripts/provision-metabase.ts",
+    "contract:emit": "prisma contract emit"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@prisma/orm-postgres": "^8.0.0-rc.9",
+    "cors": "^2.8.6",
+    "csv-parse": "^7.0.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "morgan": "^1.12.0",
+    "zod": "^4.6.1"
+  },
+  "devDependencies": {
+    "@prisma/cli-engine": "^0.2.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.20.2",
+    "prisma": "^8.0.0-rc.10",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
