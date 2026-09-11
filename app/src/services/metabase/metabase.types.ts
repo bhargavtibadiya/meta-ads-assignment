@@ -35,11 +35,23 @@ export interface MetabaseQueryColumn {
   readonly fieldRef: MetabaseFieldRef;
 }
 
-export interface MetabaseParameterValuesSource {
-  readonly cardId: number;
-  readonly valueField: MetabaseFieldRef;
-  readonly labelField: MetabaseFieldRef;
+export interface MetabaseStaticListValue {
+  readonly value: string;
+  readonly label: string;
 }
+
+export interface MetabaseParameterValuesSource {
+  readonly values: readonly MetabaseStaticListValue[];
+}
+
+export interface MetabaseNativeQueryResult {
+  readonly columns: readonly MetabaseQueryColumn[];
+  readonly rows: readonly MetabaseNativeQueryRow[];
+}
+
+export type MetabaseNativeQueryRow = readonly MetabaseNativeQueryCell[];
+
+export type MetabaseNativeQueryCell = string | number | boolean | null;
 
 export interface MetabaseNativeQuestion {
   readonly name: string;
@@ -82,7 +94,11 @@ export interface MetabaseClient {
   listDatabases(sessionToken: string): Promise<MetabaseDatabaseRecord[]>;
   addPostgresDatabase(sessionToken: string, config: MetabaseDbConfig): Promise<number>;
   listCards(sessionToken: string): Promise<MetabaseCardRecord[]>;
-  queryCardColumns(sessionToken: string, cardId: number): Promise<MetabaseQueryColumn[]>;
+  queryNativeSql(
+    sessionToken: string,
+    databaseId: number,
+    sql: string,
+  ): Promise<MetabaseNativeQueryResult>;
   upsertNativeQuestion(
     sessionToken: string,
     databaseId: number,
@@ -139,13 +155,18 @@ export const cardCreateResponseSchema = z.object({
   id: z.number(),
 });
 
-export const cardQueryColumnSchema = z.object({
-  name: z.string(),
-  base_type: z.string(),
-});
+export const cardQueryColumnSchema = z
+  .object({
+    name: z.string(),
+    base_type: z.string(),
+  })
+  .passthrough();
 
-export const cardQueryResponseSchema = z.object({
-  data: z.object({
-    cols: z.array(cardQueryColumnSchema),
-  }),
-});
+export const cardQueryResponseSchema = z
+  .object({
+    data: z.object({
+      cols: z.array(cardQueryColumnSchema),
+      rows: z.array(z.array(z.union([z.string(), z.number(), z.boolean(), z.null()]))).optional(),
+    }),
+  })
+  .passthrough();

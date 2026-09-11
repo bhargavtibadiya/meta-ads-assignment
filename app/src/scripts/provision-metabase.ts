@@ -7,10 +7,11 @@ import { getSubmissionPath } from '../utils/helpers/paths.js';
 import { createMetabaseClient } from '../services/metabase/index.js';
 import type {
   MetabaseClient,
-  MetabaseFieldRef,
   MetabaseNativeQuestion,
+  MetabaseNativeQueryCell,
+  MetabaseNativeQueryResult,
   MetabaseParameterValuesSource,
-  MetabaseQueryColumn,
+  MetabaseStaticListValue,
   MetabaseTemplateTagMap,
 } from '../services/metabase/metabase.types.js';
 
@@ -38,19 +39,10 @@ const provisionEnvSchema = z.object({
 
 type ProvisionEnv = z.infer<typeof provisionEnvSchema>;
 
-interface CampaignPickerFields {
-  readonly valueField: MetabaseFieldRef;
-  readonly labelField: MetabaseFieldRef;
-}
-
 const QUESTION_NAME = 'Orders vs Spend';
-const CAMPAIGN_PICKER_NAME = 'Campaign filter options';
-const CAMPAIGN_ID_COLUMN = 'campaign_id';
-const CAMPAIGN_LABEL_COLUMN = 'campaign_label';
 
-// [WHY] Metabase dropdowns have one label column, not a title + subtitle, so
-// the picker concatenates current name and the stable id.
-const CAMPAIGN_PICKER_SQL = `SELECT
+// [WHY] Metabase dropdowns have one label, so we concatenate current name + id
+const CAMPAIGN_OPTIONS_SQL = `SELECT
   id AS campaign_id,
   current_name || ' (' || id || ')' AS campaign_label
 FROM campaigns
@@ -80,19 +72,13 @@ async function main(): Promise<void> {
     password: env.METABASE_DB_PASSWORD,
   });
 
-  const pickerCardId = await client.upsertNativeQuestion(sessionToken, databaseId, {
-    name: CAMPAIGN_PICKER_NAME,
-    sql: CAMPAIGN_PICKER_SQL,
-    display: 'table',
-    templateTags: {},
-  });
-  const pickerFields = await resolveCampaignPickerFields(client, sessionToken, pickerCardId);
-  const valuesSource: MetabaseParameterValuesSource = {
-    cardId: pickerCardId,
-    valueField: pickerFields.valueField,
-    labelField: pickerFields.labelField,
-  };
+  const optionsResult = await client.queryNativeSql(sessionToken, databaseId, CAMPAIGN_OPTIONS_SQL);
+  const campaignOptions = toCampaignOptions(optionsResult);
+  if (campaignOptions.length === 0) {
+    logger.warn('no campaigns found; run sync before provision so the Campaign dropdown has rows');
+  }
 
+  const valuesSource: MetabaseParameterValuesSource = { values: campaignOptions };
   const sql = await readFile(getSubmissionPath('orders-vs-spend-question.sql'), 'utf8');
   const question: MetabaseNativeQuestion = {
     name: QUESTION_NAME,
@@ -106,7 +92,7 @@ async function main(): Promise<void> {
     url: env.METABASE_URL,
     databaseId,
     cardId,
-    pickerCardId,
+    campaignOptions: campaignOptions.length,
     question: QUESTION_NAME,
   });
 }
@@ -159,48 +145,41 @@ async function ensureSession(client: MetabaseClient, env: ProvisionEnv): Promise
 }
 
 /**
- * Reads the picker card's result columns, falling back to known native aliases.
+ * Reads campaign id + label rows from the dataset result.
  *
- * @param client - Metabase client
- * @param sessionToken - Session token
- * @param pickerCardId - Saved picker question id
- * @returns Field refs for value (id) and label (name + id)
+ * @param result - Native SQL result
+ * @returns Dropdown options
  */
-async function resolveCampaignPickerFields(
-  client: MetabaseClient,
-  sessionToken: string,
-  pickerCardId: number,
-): Promise<CampaignPickerFields> {
-  try {
-    const columns = await client.queryCardColumns(sessionToken, pickerCardId);
-    return {
-      valueField: requireColumn(columns, CAMPAIGN_ID_COLUMN).fieldRef,
-      labelField: requireColumn(columns, CAMPAIGN_LABEL_COLUMN).fieldRef,
-    };
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'card query failed';
-    logger.warn('campaign picker query failed, using named field refs', { message });
-    return {
-      valueField: ['field', CAMPAIGN_ID_COLUMN, { 'base-type': 'type/Text' }],
-      labelField: ['field', CAMPAIGN_LABEL_COLUMN, { 'base-type': 'type/Text' }],
-    };
+function toCampaignOptions(result: MetabaseNativeQueryResult): MetabaseStaticListValue[] {
+  const options: MetabaseStaticListValue[] = [];
+  for (const row of result.rows) {
+    const value = cellToString(row[0]);
+    const label = cellToString(row[1]);
+    if (value === null || label === null) {
+      continue;
+    }
+    options.push({ value, label });
   }
+  return options;
 }
 
 /**
- * Finds a result column by name.
+ * Coerces a dataset cell to a non-empty string.
  *
- * @param columns - Query result columns
- * @param name - Expected column alias
- * @returns Matching column
- * @throws {Error} if the column is missing
+ * @param cell - Dataset cell
+ * @returns String value, or null if empty
  */
-function requireColumn(columns: readonly MetabaseQueryColumn[], name: string): MetabaseQueryColumn {
-  const match = columns.find((column) => column.name === name);
-  if (match === undefined) {
-    throw new Error(`Campaign picker card is missing column ${name}`);
+function cellToString(cell: MetabaseNativeQueryCell | undefined): string | null {
+  if (cell === undefined || cell === null) {
+    return null;
   }
-  return match;
+  if (typeof cell === 'string') {
+    return cell.length > 0 ? cell : null;
+  }
+  if (typeof cell === 'number' || typeof cell === 'boolean') {
+    return String(cell);
+  }
+  return null;
 }
 
 /**

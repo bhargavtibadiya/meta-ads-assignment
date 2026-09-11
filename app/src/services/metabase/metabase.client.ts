@@ -6,12 +6,15 @@ import type {
   MetabaseClient,
   MetabaseDatabaseRecord,
   MetabaseDbConfig,
-  MetabaseFieldRef,
   MetabaseNativeQuestion,
+  MetabaseNativeQueryCell,
+  MetabaseNativeQueryResult,
+  MetabaseNativeQueryRow,
   MetabaseParameterValuesSource,
   MetabaseQueryColumn,
   MetabaseSession,
   MetabaseSetupUser,
+  MetabaseStaticListValue,
   MetabaseTemplateTag,
 } from './metabase.types.js';
 import {
@@ -62,12 +65,13 @@ interface NativeTemplateTag {
   readonly type: 'text' | 'date';
   readonly required: boolean;
   readonly 'widget-type': string;
+  readonly values_query_type?: 'list';
+  readonly values_source_type?: 'static-list';
+  readonly values_source_config?: NativeStaticListConfig;
 }
 
-interface CardParameterValuesConfig {
-  readonly card_id: number;
-  readonly value_field: MetabaseFieldRef;
-  readonly label_field: MetabaseFieldRef;
+interface NativeStaticListConfig {
+  readonly values: readonly (readonly [string, string])[];
 }
 
 interface CardParameter {
@@ -77,8 +81,8 @@ interface CardParameter {
   readonly slug: string;
   readonly target: CardParameterTarget;
   readonly values_query_type?: 'list';
-  readonly values_source_type?: 'card';
-  readonly values_source_config?: CardParameterValuesConfig;
+  readonly values_source_type?: 'static-list';
+  readonly values_source_config?: NativeStaticListConfig;
 }
 
 type CardParameterTarget = readonly ['variable', readonly ['template-tag', string]];
@@ -292,15 +296,27 @@ export function createMetabaseClient(options: MetabaseClientOptions): MetabaseCl
       return created.id;
     },
 
-    async queryCardColumns(sessionToken: string, cardId: number): Promise<MetabaseQueryColumn[]> {
+    async queryNativeSql(
+      sessionToken: string,
+      databaseId: number,
+      sql: string,
+    ): Promise<MetabaseNativeQueryResult> {
       const body = await requestJson(
         'POST',
-        `${baseUrl}/api/card/${cardId}/query`,
-        JSON.stringify({ ignore_cache: true, parameters: [] }),
+        `${baseUrl}/api/dataset`,
+        JSON.stringify({
+          database: databaseId,
+          type: 'native',
+          native: { query: sql },
+        }),
         sessionHeaders(sessionToken),
       );
-      const parsed = parseDto(cardQueryResponseSchema, body, 'Metabase card query');
-      return parsed.data.cols.map(toQueryColumn);
+      const parsed = parseDto(cardQueryResponseSchema, body, 'Metabase native dataset');
+      const rows = parsed.data.rows ?? [];
+      return {
+        columns: parsed.data.cols.map(toQueryColumn),
+        rows: rows.map(toNativeQueryRow),
+      };
     },
   };
 }
@@ -372,13 +388,24 @@ function toNativeTemplateTags(tags: MetabaseNativeQuestion['templateTags']): Nat
  * @returns Metabase tag
  */
 function toNativeTemplateTag(tag: MetabaseTemplateTag): NativeTemplateTag {
-  return {
+  const base: NativeTemplateTag = {
     id: tag.id,
     name: tag.name,
     'display-name': tag.displayName,
     type: tag.type,
     required: tag.required,
-    'widget-type': tag.type === 'date' ? 'date/single' : 'string/=',
+    'widget-type': tag.type === 'date' ? 'date/single' : 'category',
+  };
+
+  if (tag.valuesSource === undefined) {
+    return base;
+  }
+
+  return {
+    ...base,
+    values_query_type: 'list',
+    values_source_type: 'static-list',
+    values_source_config: toStaticListConfig(tag.valuesSource),
   };
 }
 
@@ -406,7 +433,7 @@ function toCardParameter(tag: MetabaseTemplateTag): CardParameter {
   const target: CardParameterTarget = ['variable', ['template-tag', tag.name]];
   const parameter: CardParameter = {
     id: tag.id,
-    type: tag.type === 'date' ? 'date/single' : 'string/=',
+    type: tag.type === 'date' ? 'date/single' : 'category',
     name: tag.displayName,
     slug: tag.name,
     target,
@@ -416,37 +443,40 @@ function toCardParameter(tag: MetabaseTemplateTag): CardParameter {
     return parameter;
   }
 
-  return withCardValuesSource(parameter, tag.valuesSource);
-}
-
-/**
- * Attaches a saved-question dropdown (value + label columns) to a parameter.
- *
- * @param parameter - Base parameter
- * @param source - Picker card and field refs
- * @returns Parameter with values_source_* set
- */
-function withCardValuesSource(
-  parameter: CardParameter,
-  source: MetabaseParameterValuesSource,
-): CardParameter {
   return {
     ...parameter,
     values_query_type: 'list',
-    values_source_type: 'card',
-    values_source_config: {
-      card_id: source.cardId,
-      value_field: source.valueField,
-      label_field: source.labelField,
-    },
+    values_source_type: 'static-list',
+    values_source_config: toStaticListConfig(tag.valuesSource),
   };
+}
+
+/**
+ * Converts labeled options into Metabase's [value, label] static-list rows.
+ *
+ * @param source - Campaign options
+ * @returns values_source_config payload
+ */
+function toStaticListConfig(source: MetabaseParameterValuesSource): NativeStaticListConfig {
+  return { values: source.values.map(toStaticListPair) };
+}
+
+/**
+ * Maps one option onto a Metabase static-list pair.
+ *
+ * @param option - Value stored in SQL and label shown in the widget
+ * @returns [value, label]
+ */
+function toStaticListPair(option: MetabaseStaticListValue): readonly [string, string] {
+  const pair: readonly [string, string] = [option.value, option.label];
+  return pair;
 }
 
 /**
  * Maps a Metabase query column onto our column shape.
  *
- * @param column - Raw col from POST /api/card/:id/query
- * @returns Named field ref used by values_source_config
+ * @param column - Raw col from POST /api/dataset
+ * @returns Named field ref
  */
 function toQueryColumn(column: CardQueryColumnInput): MetabaseQueryColumn {
   return {
@@ -454,6 +484,26 @@ function toQueryColumn(column: CardQueryColumnInput): MetabaseQueryColumn {
     baseType: column.base_type,
     fieldRef: ['field', column.name, { 'base-type': column.base_type }],
   };
+}
+
+/**
+ * Copies one dataset row without widening cell types.
+ *
+ * @param row - Raw dataset row
+ * @returns Typed row
+ */
+function toNativeQueryRow(row: readonly MetabaseNativeQueryCell[]): MetabaseNativeQueryRow {
+  return row.map(toNativeQueryCell);
+}
+
+/**
+ * Identity map for a dataset cell.
+ *
+ * @param cell - Raw cell
+ * @returns Same cell
+ */
+function toNativeQueryCell(cell: MetabaseNativeQueryCell): MetabaseNativeQueryCell {
+  return cell;
 }
 
 /**
