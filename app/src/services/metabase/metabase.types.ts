@@ -21,10 +21,30 @@ export interface MetabaseSetupUser {
   readonly siteName: string;
 }
 
+export type MetabaseCardDisplay = 'combo' | 'line' | 'table';
+
+export interface MetabaseFieldRefOptions {
+  readonly 'base-type': string;
+}
+
+export type MetabaseFieldRef = readonly ['field', string, MetabaseFieldRefOptions];
+
+export interface MetabaseQueryColumn {
+  readonly name: string;
+  readonly baseType: string;
+  readonly fieldRef: MetabaseFieldRef;
+}
+
+export interface MetabaseParameterValuesSource {
+  readonly cardId: number;
+  readonly valueField: MetabaseFieldRef;
+  readonly labelField: MetabaseFieldRef;
+}
+
 export interface MetabaseNativeQuestion {
   readonly name: string;
   readonly sql: string;
-  readonly display: 'combo' | 'line';
+  readonly display: MetabaseCardDisplay;
   readonly templateTags: MetabaseTemplateTagMap;
 }
 
@@ -38,6 +58,7 @@ export interface MetabaseTemplateTag {
   readonly displayName: string;
   readonly type: 'text' | 'date';
   readonly required: boolean;
+  readonly valuesSource?: MetabaseParameterValuesSource;
 }
 
 export interface MetabaseSession {
@@ -61,6 +82,7 @@ export interface MetabaseClient {
   listDatabases(sessionToken: string): Promise<MetabaseDatabaseRecord[]>;
   addPostgresDatabase(sessionToken: string, config: MetabaseDbConfig): Promise<number>;
   listCards(sessionToken: string): Promise<MetabaseCardRecord[]>;
+  queryCardColumns(sessionToken: string, cardId: number): Promise<MetabaseQueryColumn[]>;
   upsertNativeQuestion(
     sessionToken: string,
     databaseId: number,
@@ -115,4 +137,15 @@ export const databaseCreateResponseSchema = z.object({
 
 export const cardCreateResponseSchema = z.object({
   id: z.number(),
+});
+
+export const cardQueryColumnSchema = z.object({
+  name: z.string(),
+  base_type: z.string(),
+});
+
+export const cardQueryResponseSchema = z.object({
+  data: z.object({
+    cols: z.array(cardQueryColumnSchema),
+  }),
 });

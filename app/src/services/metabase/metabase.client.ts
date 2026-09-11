@@ -1,11 +1,15 @@
 import { parseDto } from '../../utils/helpers/parse-dto.js';
 import { logger } from '../../utils/helpers/logger.js';
 import type {
+  MetabaseCardDisplay,
   MetabaseCardRecord,
   MetabaseClient,
   MetabaseDatabaseRecord,
   MetabaseDbConfig,
+  MetabaseFieldRef,
   MetabaseNativeQuestion,
+  MetabaseParameterValuesSource,
+  MetabaseQueryColumn,
   MetabaseSession,
   MetabaseSetupUser,
   MetabaseTemplateTag,
@@ -13,6 +17,7 @@ import type {
 import {
   cardCreateResponseSchema,
   cardListSchema,
+  cardQueryResponseSchema,
   databaseCreateResponseSchema,
   databaseListSchema,
   sessionPropertiesSchema,
@@ -59,21 +64,30 @@ interface NativeTemplateTag {
   readonly 'widget-type': string;
 }
 
+interface CardParameterValuesConfig {
+  readonly card_id: number;
+  readonly value_field: MetabaseFieldRef;
+  readonly label_field: MetabaseFieldRef;
+}
+
 interface CardParameter {
   readonly id: string;
   readonly type: string;
   readonly name: string;
   readonly slug: string;
   readonly target: CardParameterTarget;
+  readonly values_query_type?: 'list';
+  readonly values_source_type?: 'card';
+  readonly values_source_config?: CardParameterValuesConfig;
 }
 
 type CardParameterTarget = readonly ['variable', readonly ['template-tag', string]];
 
 interface CardVisualizationSettings {
-  readonly 'graph.dimensions': readonly string[];
-  readonly 'graph.metrics': readonly string[];
-  readonly 'graph.y_axis.auto_split': boolean;
-  readonly series_settings: SeriesSettingsMap;
+  readonly 'graph.dimensions'?: readonly string[];
+  readonly 'graph.metrics'?: readonly string[];
+  readonly 'graph.y_axis.auto_split'?: boolean;
+  readonly series_settings?: SeriesSettingsMap;
 }
 
 interface SeriesSettingsMap {
@@ -87,7 +101,7 @@ interface SeriesAxisSetting {
 
 interface CardWriteBody {
   readonly name: string;
-  readonly display: 'combo' | 'line';
+  readonly display: MetabaseCardDisplay;
   readonly dataset_query: NativeQueryPayload;
   readonly visualization_settings: CardVisualizationSettings;
   readonly parameters: readonly CardParameter[];
@@ -132,6 +146,11 @@ interface PostgresDetails {
   readonly user: string;
   readonly password: string;
   readonly ssl: boolean;
+}
+
+interface CardQueryColumnInput {
+  readonly name: string;
+  readonly base_type: string;
 }
 
 // ============================================================================
@@ -272,6 +291,17 @@ export function createMetabaseClient(options: MetabaseClientOptions): MetabaseCl
       logger.info('created Metabase question', { name: question.name, id: created.id });
       return created.id;
     },
+
+    async queryCardColumns(sessionToken: string, cardId: number): Promise<MetabaseQueryColumn[]> {
+      const body = await requestJson(
+        'POST',
+        `${baseUrl}/api/card/${cardId}/query`,
+        JSON.stringify({ ignore_cache: true, parameters: [] }),
+        sessionHeaders(sessionToken),
+      );
+      const parsed = parseDto(cardQueryResponseSchema, body, 'Metabase card query');
+      return parsed.data.cols.map(toQueryColumn);
+    },
   };
 }
 
@@ -294,16 +324,30 @@ function buildCardWriteBody(databaseId: number, question: MetabaseNativeQuestion
         'template-tags': toNativeTemplateTags(question.templateTags),
       },
     },
-    visualization_settings: {
-      'graph.dimensions': ['date'],
-      'graph.metrics': ['daily_spend', 'daily_order_count'],
-      'graph.y_axis.auto_split': true,
-      series_settings: {
-        daily_spend: { axis: 'left', display: 'line' },
-        daily_order_count: { axis: 'right', display: 'bar' },
-      },
-    },
+    visualization_settings: buildVisualizationSettings(question.display),
     parameters: toCardParameters(question.templateTags),
+  };
+}
+
+/**
+ * Chart cards get dual-axis settings; the campaign picker is a plain table.
+ *
+ * @param display - Saved-question display type
+ * @returns Visualization settings Metabase accepts for that display
+ */
+function buildVisualizationSettings(display: MetabaseCardDisplay): CardVisualizationSettings {
+  if (display !== 'combo' && display !== 'line') {
+    return {};
+  }
+
+  return {
+    'graph.dimensions': ['date'],
+    'graph.metrics': ['daily_spend', 'daily_order_count'],
+    'graph.y_axis.auto_split': true,
+    series_settings: {
+      daily_spend: { axis: 'left', display: 'line' },
+      daily_order_count: { axis: 'right', display: 'bar' },
+    },
   };
 }
 
@@ -347,15 +391,69 @@ function toNativeTemplateTag(tag: MetabaseTemplateTag): NativeTemplateTag {
 function toCardParameters(tags: MetabaseNativeQuestion['templateTags']): CardParameter[] {
   const parameters: CardParameter[] = [];
   for (const tag of Object.values(tags)) {
-    parameters.push({
-      id: tag.id,
-      type: tag.type === 'date' ? 'date/single' : 'string/=',
-      name: tag.displayName,
-      slug: tag.name,
-      target: ['variable', ['template-tag', tag.name]],
-    });
+    parameters.push(toCardParameter(tag));
   }
   return parameters;
+}
+
+/**
+ * Maps one template tag onto a Metabase card parameter, including dropdown source.
+ *
+ * @param tag - Internal tag
+ * @returns Card parameter
+ */
+function toCardParameter(tag: MetabaseTemplateTag): CardParameter {
+  const target: CardParameterTarget = ['variable', ['template-tag', tag.name]];
+  const parameter: CardParameter = {
+    id: tag.id,
+    type: tag.type === 'date' ? 'date/single' : 'string/=',
+    name: tag.displayName,
+    slug: tag.name,
+    target,
+  };
+
+  if (tag.valuesSource === undefined) {
+    return parameter;
+  }
+
+  return withCardValuesSource(parameter, tag.valuesSource);
+}
+
+/**
+ * Attaches a saved-question dropdown (value + label columns) to a parameter.
+ *
+ * @param parameter - Base parameter
+ * @param source - Picker card and field refs
+ * @returns Parameter with values_source_* set
+ */
+function withCardValuesSource(
+  parameter: CardParameter,
+  source: MetabaseParameterValuesSource,
+): CardParameter {
+  return {
+    ...parameter,
+    values_query_type: 'list',
+    values_source_type: 'card',
+    values_source_config: {
+      card_id: source.cardId,
+      value_field: source.valueField,
+      label_field: source.labelField,
+    },
+  };
+}
+
+/**
+ * Maps a Metabase query column onto our column shape.
+ *
+ * @param column - Raw col from POST /api/card/:id/query
+ * @returns Named field ref used by values_source_config
+ */
+function toQueryColumn(column: CardQueryColumnInput): MetabaseQueryColumn {
+  return {
+    name: column.name,
+    baseType: column.base_type,
+    fieldRef: ['field', column.name, { 'base-type': column.base_type }],
+  };
 }
 
 /**
