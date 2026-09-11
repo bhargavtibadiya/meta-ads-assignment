@@ -34,6 +34,7 @@ Match Meta data against the `orders.csv` we provide. Where the join is imperfect
 Point Metabase at your database and build a single question: **daily ad spend and daily order count on the same time axis**, filterable by campaign, over a date range.
 
 Submit:
+
 - a screenshot of the chart,
 - the SQL or query definition behind it,
 - `docker-compose.yml` or equivalent so we can run Metabase against your DB ourselves.
